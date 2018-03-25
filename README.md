@@ -24,4 +24,4 @@ I'm not going to write specifics here because it's a bit more complicated than W
 
 ### Setup (Mac)
 
-¯\_(ツ)_/¯
+¯\\_(ツ)_/¯
