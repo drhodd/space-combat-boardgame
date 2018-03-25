@@ -169,7 +169,7 @@ var Tile = {
     
     //create a new tile (instance of createjs.Bitmap, with custom props)
     create: function(i, j, tile_type) {
-        var hex = new createjs.Bitmap("../images/tiles/"+tile_type.img);
+        var hex = new createjs.Bitmap("/images/tiles/"+tile_type.img);
         hex.type = tile_type;
         hex.value = -1;
         hex.i = i;
