@@ -1,72 +1,72 @@
 <body onload="init();">
-	<div class = "main">
-		<center>
-			<canvas class = "canvas" width = "775px" height = "865px" id="canvas">
-				There's supposed to be a game here! Try using Firefox or Chrome.
-			</canvas>
-		</center>
-		<br>
-	</div>
-	<div class = "left">
-		<div class = "chat center container">
-			<div class = "top" style = "margin-left: 35px; top: 490px;">
-				<input id = "chatbox" maxlength = "32" placeholder = "Type something..." class = "chatbox" type = "text"></input>
-			</div>
-			<!--GAME CHAT-->
-			<div id = "chat"></div>
-		</div>
-	</div>
-	<div class = "top">
-	</div>
+    <div class = "main">
+        <center>
+            <canvas class = "canvas" width = "775px" height = "865px" id="canvas">
+                There's supposed to be a game here! Try using Firefox or Chrome.
+            </canvas>
+        </center>
+        <br>
+    </div>
+    <div class = "left">
+        <div class = "chat center container">
+            <div class = "top" style = "margin-left: 35px; top: 490px;">
+                <input id = "chatbox" maxlength = "32" placeholder = "Type something..." class = "chatbox" type = "text"></input>
+            </div>
+            <!--GAME CHAT-->
+            <div id = "chat"></div>
+        </div>
+    </div>
+    <div class = "top">
+    </div>
 </body>
 
 <script>
-	var stage = new createjs.Stage("canvas");
-	var canvas = document.getElementById("canvas");
-	function init() {
-		stage.enableMouseOver(20); 
-		Board.create();
-		stage.update();
-	}
+    var stage = new createjs.Stage("canvas");
+    var canvas = document.getElementById("canvas");
+    function init() {
+        stage.enableMouseOver(20); 
+        Board.create();
+        stage.update();
+    }
 </script>
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
-	var gameID = "{{gameID}}";
-	var socketID = "";
-	var io = io("/"+gameID);
-	
-	io.on("connect", function(message) {
-		console.log("Connected to socket server as "+message+"!");
-		io.emit("board", gameID);
-	});
-	
-	io.on("board", function(tiles) {
-		console.log("Recieved board data from server!");
-		for (var t = 0; t < tiles.length; t++) {
-			console.log(tiles[t].name);
-			Board.update(tiles[t].x, tiles[t].y, Tile[tiles[t].name]);
-		}
-	});
-	
-	io.on("chat", function(message) {
-		var msg = message.content;
-		var sender = message.sender;
-		var chat_dom = document.getElementById("chat");
-		var chats = chat_dom.innerHTML.split("<br>");
-		if (chats.length > 23) chat_dom.innerHTML = chat_dom.innerHTML.replace(chats[0]+"<br>", "");
-			
-		chat_dom.innerHTML += "<b>"+"Player"+"</b>: <text style = 'color: gray;'>"+msg+"</text><br>";
-	});
-	
+    var gameID = "{{gameID}}";
+    var socketID = "";
+    var io = io("/"+gameID);
+    
+    io.on("connect", function(message) {
+        console.log("Connected to socket server as "+message+"!");
+        io.emit("board", gameID);
+    });
+    
+    io.on("board", function(tiles) {
+        console.log("Recieved board data from server!");
+        for (var t = 0; t < tiles.length; t++) {
+            console.log(tiles[t].name);
+            Board.update(tiles[t].x, tiles[t].y, Tile[tiles[t].name]);
+        }
+    });
+    
+    io.on("chat", function(message) {
+        var msg = message.content;
+        var sender = message.sender;
+        var chat_dom = document.getElementById("chat");
+        var chats = chat_dom.innerHTML.split("<br>");
+        if (chats.length > 23) chat_dom.innerHTML = chat_dom.innerHTML.replace(chats[0]+"<br>", "");
+            
+        chat_dom.innerHTML += "<b>"+"Player"+"</b>: <text style = 'color: gray;'>"+msg+"</text><br>";
+    });
+    
 </script>
 
 <script>
-	var chatbox = document.getElementById('chatbox');
-	chatbox.onkeydown = function(event) {
-		if (event.keyCode == 13 && chatbox.value.length > 0) {
-			io.emit("chat", {content: chatbox.value});
-			chatbox.value = "";
-		}
-	}
+    var chatbox = document.getElementById('chatbox');
+    chatbox.onkeydown = function(event) {
+        if (event.keyCode == 13 && chatbox.value.length > 0) {
+            io.emit("chat", {content: chatbox.value});
+            chatbox.value = "";
+        }
+    }
 </script>

@@ -13,9 +13,9 @@ socket.init(require('socket.io')(server));
 
 /*Set the Handlebars options*/
 app.engine('.hbs', exphbs({
-	  defaultLayout: 'main',
-	  extname: '.hbs',
-	  layoutsDir: path.join(__dirname, 'views/layouts')
+      defaultLayout: 'main',
+      extname: '.hbs',
+      layoutsDir: path.join(__dirname, 'views/layouts')
 }));
 app.set('view engine', '.hbs');
 app.set('views', path.join(__dirname, 'views'));
@@ -31,44 +31,44 @@ app.use('css',express.static(path.join(__dirname, 'views/assets/stylesheets')));
 /*HTTP REQUEST HANDLERS*/
 
 app.get('/new', (request, response) => {
-	var r = Math.random().toString(36).substring(8);
-	database.createGame(r, function(err, result) { //render only when operation completes
-		if (err) { console.log("An error occured creating game "+r+"."); return; }
-		//create the socket namespace for the game (checks if already exists)
-		socket.createNamespace(r);
-		response.render("redirect", {
-			url: "/game/"+r
-		});
-	});
+    var r = Math.random().toString(36).substring(8);
+    database.createGame(r, function(err, result) { //render only when operation completes
+        if (err) { console.log("An error occured creating game "+r+"."); return; }
+        //create the socket namespace for the game (checks if already exists)
+        socket.createNamespace(r);
+        response.render("redirect", {
+            url: "/game/"+r
+        });
+    });
 });
 
 app.get('/game/:gameID', (request, response) => {
-	//create the socket namespace for the game (checks if already exists)
-	var gameID = request.params.gameID;
-	database.get("games", {url: gameID}, function(err, docs) {
-		if (err || docs.length == 0) { 
-			console.log("A game with ID "+gameID+" was not found!");
-			response.render("404", {});
-			return; 
-		} else {
-			socket.createNamespace(gameID);
-			response.render("game", {
-				layout: "createjs",
-				gameID: gameID
-			});
-		}
-	});
+    //create the socket namespace for the game (checks if already exists)
+    var gameID = request.params.gameID;
+    database.get("games", {url: gameID}, function(err, docs) {
+        if (err || docs.length == 0) { 
+            console.log("A game with ID "+gameID+" was not found!");
+            response.render("404", {});
+            return; 
+        } else {
+            socket.createNamespace(gameID);
+            response.render("game", {
+                layout: "createjs",
+                gameID: gameID
+            });
+        }
+    });
 });
 
 //catchall and 404
 app.get('*', (request, response) => {
-	response.render("404", {});
+    response.render("404", {});
 });
 
 /*LAUNCH THE HTTP SERVER ON PORT 80*/
 const port = 80;
 server.listen(port, function(err) {
-	if (err) console.log("An error occurred.");
-	console.log("Server started on port "+port);
-	database.connect();
+    if (err) console.log("An error occurred.");
+    console.log("Server started on port "+port);
+    database.connect();
 });

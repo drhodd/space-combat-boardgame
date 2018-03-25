@@ -1,71 +1,71 @@
 body {
-	 background: lightblue url("/images/bg.png") repeat fixed center; 
+     background: lightblue url("/images/bg.png") repeat fixed center; 
 }
 
 hr { border: 0; height: 0; border-top: 1px solid rgba(0, 0, 0, 0.1); border-bottom: 1px solid rgba(255, 255, 255, 0.3); }
 
 .top {
-	position:absolute;
-	left:0; right:0;
-	height: 32px;
+    position:absolute;
+    left:0; right:0;
+    height: 32px;
 }
 .left {
-	position:absolute;
-	left:0; top:32px; bottom: 0;
-	width: 350px;
+    position:absolute;
+    left:0; top:32px; bottom: 0;
+    width: 350px;
 }
 .main {
-	position: absolute;
-	left:350px; top:32px; right:0; bottom:0;
+    position: absolute;
+    left:350px; top:32px; right:0; bottom:0;
 }
 
 .canvas {
-	margin: auto;
-	height: 95%;
-	max-height: 825px;
+    margin: auto;
+    height: 95%;
+    max-height: 825px;
 }
 
 .container {
-	margin: auto;
-	width: 735px;
-	padding: 10px;
-	margin-top: 10px;
+    margin: auto;
+    width: 735px;
+    padding: 10px;
+    margin-top: 10px;
     background-color: white;
-	border: 1px 1px 1px 1px solid black;
+    border: 1px 1px 1px 1px solid black;
     border-radius: 3px;
-	margin-right: 10px;
-	font-family: 'Raleway', sans-serif;
+    margin-right: 10px;
+    font-family: 'Raleway', sans-serif;
 }
 
 .center {
-	margin: auto;
-	margin-top: 10px;
+    margin: auto;
+    margin-top: 10px;
 }
 
 .chatbox {
-	width: 98%;
-	height: 100%;
-	border: none;
-	box-shadow: 1px 1px 1px 1px solid black;
-	border-top: 1px solid gray;
+    width: 98%;
+    height: 100%;
+    border: none;
+    box-shadow: 1px 1px 1px 1px solid black;
+    border-top: 1px solid gray;
 }
 
 .chat {
-	width: 90%;
-	margin-left: 25px;
-	height: 500px;
+    width: 90%;
+    margin-left: 25px;
+    height: 500px;
 }
 
 .msg {
-	margin-bottom: -25px;
-	padding-left: 10px;
-	padding-right: 10px;
-	padding-top: 10px;
-	padding-bottom: 0px;
+    margin-bottom: -25px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 10px;
+    padding-bottom: 0px;
 }
 
 h1, h2, h3, h4, h5, p {
-	font-family: 'Raleway', sans-serif;
-	color: white;
-	text-shadow: 2px 2px 10px #000000;
+    font-family: 'Raleway', sans-serif;
+    color: white;
+    text-shadow: 2px 2px 10px #000000;
 }

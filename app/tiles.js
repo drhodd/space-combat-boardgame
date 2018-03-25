@@ -22,6 +22,6 @@ module.exports.RED_ESCORT = {s: 8, m: 6, ds: 2, dl: 2};
 module.exports.RED_FLAGSHIP = {s: 40, m: 2, ds: 24, dl: 12};
 module.exports.RED_GUNSHIP = {s: 16, m: 5, ds: 6, dl: 0};
 module.exports.RED_MARAUDER = {s: 12, m: 5, ds: 4, dl: 2};
-	
+    
 //if the tile has no shield, it's not a ship
 module.exports.isShip = function(tile_type) { return tile_type.s > 0; }
