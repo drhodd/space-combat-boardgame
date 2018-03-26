@@ -42,8 +42,10 @@ app.get('/new', (request, response) => {
 
 app.get('/game/:gameID', (request, response) => {
     var gameID = request.params.gameID;
-    response.render("redirect", {
-        url: "/game/"+gameID+"/spectate"
+    database.assignTeam(gameID, function(err, teamID) {
+        response.render("redirect", {
+            url: "/game/"+gameID+"/"+teamID
+        });
     });
 });
 
@@ -57,6 +59,7 @@ app.get('/game/:gameID/:teamID', (request, response) => {
             response.render("404", {});
             return; 
         } else {
+            database.get
             response.render("game", {
                 layout: "createjs",
                 gameID: gameID,

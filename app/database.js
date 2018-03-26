@@ -18,52 +18,85 @@ function createTables() {
 }
 
 function createGame(callback) {
-    var random = Math.random().toString(36).substring(8);
-    var random2 = Math.random().toString(36).substring(8);
-    var game = {url: random, red_url: random2, blue_url: ""};
+    var random_url = Math.random().toString(36).substring(8);
+    var game = {url: random_url, red_url: "", blue_url: ""};
     var tile_entries = [
-        {name: "RED_FLAGSHIP", x: 7, y: 0, game: random},
-        {name: "RED_DESTROYER", x: 6, y: 0, game: random},
-        {name: "RED_DESTROYER", x: 8, y: 0, game: random},
-        {name: "RED_GUNSHIP", x: 5, y: 0, game: random},
-        {name: "RED_BATTLESHIP", x: 7, y: 1, game: random},
-        {name: "RED_GUNSHIP", x: 9, y: 0, game: random},
-        {name: "RED_MARAUDER", x: 4, y: 0, game: random},
-        {name: "RED_BOMBER", x: 6, y: 1, game: random},
-        {name: "RED_BOMBER", x: 8, y: 1, game: random},
-        {name: "RED_MARAUDER", x: 10, y: 0, game: random},
-        {name: "RED_ESCORT", x: 5, y: 1, game: random},
-        {name: "RED_CARRIER", x: 7, y: 2, game: random},
-        {name: "RED_ESCORT", x: 9, y: 1, game: random},
-        {name: "RED_ESCORT", x: 6, y: 2, game: random},
-        {name: "RED_ESCORT", x: 8, y: 2, game: random},
-        {name: "RED_CRUISER", x: 7, y: 3, game: random},
+        {name: "RED_FLAGSHIP", x: 7, y: 0, game: random_url},
+        {name: "RED_DESTROYER", x: 6, y: 0, game: random_url},
+        {name: "RED_DESTROYER", x: 8, y: 0, game: random_url},
+        {name: "RED_GUNSHIP", x: 5, y: 0, game: random_url},
+        {name: "RED_BATTLESHIP", x: 7, y: 1, game: random_url},
+        {name: "RED_GUNSHIP", x: 9, y: 0, game: random_url},
+        {name: "RED_MARAUDER", x: 4, y: 0, game: random_url},
+        {name: "RED_BOMBER", x: 6, y: 1, game: random_url},
+        {name: "RED_BOMBER", x: 8, y: 1, game: random_url},
+        {name: "RED_MARAUDER", x: 10, y: 0, game: random_url},
+        {name: "RED_ESCORT", x: 5, y: 1, game: random_url},
+        {name: "RED_CARRIER", x: 7, y: 2, game: random_url},
+        {name: "RED_ESCORT", x: 9, y: 1, game: random_url},
+        {name: "RED_ESCORT", x: 6, y: 2, game: random_url},
+        {name: "RED_ESCORT", x: 8, y: 2, game: random_url},
+        {name: "RED_CRUISER", x: 7, y: 3, game: random_url},
         
-        {name: "BLUE_FLAGSHIP", x: 7, y: 14, game: random},
-        {name: "BLUE_DESTROYER", x: 6, y: 13, game: random},
-        {name: "BLUE_DESTROYER", x: 8, y: 13, game: random},
-        {name: "BLUE_GUNSHIP", x: 5, y: 12, game: random},
-        {name: "BLUE_BATTLESHIP", x: 7, y: 13, game: random},
-        {name: "BLUE_GUNSHIP", x: 9, y: 12, game: random},
-        {name: "BLUE_MARAUDER", x: 4, y: 11, game: random},
-        {name: "BLUE_BOMBER", x: 6, y: 12, game: random},
-        {name: "BLUE_BOMBER", x: 8, y: 12, game: random},
-        {name: "BLUE_MARAUDER", x: 10, y: 11, game: random},
-        {name: "BLUE_ESCORT", x: 5, y: 11, game: random},
-        {name: "BLUE_CARRIER", x: 7, y: 12, game: random},
-        {name: "BLUE_ESCORT", x: 9, y: 11, game: random},
-        {name: "BLUE_ESCORT", x: 6, y: 11, game: random},
-        {name: "BLUE_ESCORT", x: 8, y: 11, game: random},
-        {name: "BLUE_CRUISER", x: 7, y: 11, game: random}
+        {name: "BLUE_FLAGSHIP", x: 7, y: 14, game: random_url},
+        {name: "BLUE_DESTROYER", x: 6, y: 13, game: random_url},
+        {name: "BLUE_DESTROYER", x: 8, y: 13, game: random_url},
+        {name: "BLUE_GUNSHIP", x: 5, y: 12, game: random_url},
+        {name: "BLUE_BATTLESHIP", x: 7, y: 13, game: random_url},
+        {name: "BLUE_GUNSHIP", x: 9, y: 12, game: random_url},
+        {name: "BLUE_MARAUDER", x: 4, y: 11, game: random_url},
+        {name: "BLUE_BOMBER", x: 6, y: 12, game: random_url},
+        {name: "BLUE_BOMBER", x: 8, y: 12, game: random_url},
+        {name: "BLUE_MARAUDER", x: 10, y: 11, game: random_url},
+        {name: "BLUE_ESCORT", x: 5, y: 11, game: random_url},
+        {name: "BLUE_CARRIER", x: 7, y: 12, game: random_url},
+        {name: "BLUE_ESCORT", x: 9, y: 11, game: random_url},
+        {name: "BLUE_ESCORT", x: 6, y: 11, game: random_url},
+        {name: "BLUE_ESCORT", x: 8, y: 11, game: random_url},
+        {name: "BLUE_CRUISER", x: 7, y: 11, game: random_url}
     ];
     
     insert("games", [game], function(err, result){
-        if (err) { console.log("Failed to create game "+random+"!"); return; }
+        if (err) { console.log("Failed to create game "+random_url+"!"); return; }
         insert("tiles", tile_entries, function(err, result) {
-            callback(err, result, random+"/"+random2); //callback with the random URL pointing to red team
+            callback(err, result, random_url); //callback with the random URL
         });
     });
 
+}
+
+/**
+ * Assigns a team to the specified game. Assigns red first, then blue.
+ * Then it passes some information about the team in the callback function.
+ * @param {String} gameURL The game ID.
+ * @param {Function} callback Called if successful. 
+ * Parameters are err (Error) and teamName (String).
+ */
+function assignTeam(gameURL, callback) {
+    get("games", {url: gameURL}, function(err, result)  {
+        var randomTeamURL = Math.random().toString(36).substring(8);
+        var red = result[0].red_url.length != "";
+        var blue = result[0].blue_url.length != "";
+        console.log("Assigning team to game "+gameURL+": "+red+", "+blue);
+        update("games", {url: gameURL}, 
+            (!red ? {red_url: randomTeamURL} 
+                : (!blue ? {blue_url: randomTeamURL} : {})));
+        callback(err, (red && blue ? "spectate" : randomTeamURL));
+    });
+}
+
+function update(collectionName, query, new_values, callback) {
+    if (Object.keys(new_values).length == 0) { 
+        console.log("No new values specified! Will not update "+collectionName+"."); 
+        return; 
+    }
+    var collection = database.collection(collectionName);
+    collection.update(query, {$set: new_values}, function(err, result) {
+        if (err) { console.log("There was an error updating collection "+collectionName+"! "
+                        +err.message); return; }
+        console.log("Updated first document matching "+query+" with values "+new_values+"!");
+        if (callback) callback(err, result);
+    });
 }
 
 function insert(collectionName, entries, callback) {
@@ -91,3 +124,4 @@ module.exports.connect = connect;
 module.exports.createGame = createGame;
 module.exports.insert = insert;
 module.exports.get = get;
+module.exports.assignTeam = assignTeam;

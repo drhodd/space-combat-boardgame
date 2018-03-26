@@ -2,10 +2,17 @@ var Board = {
     
     cols: 15,
     mid: 7,
-    texts: [],
-    tileHighlight: new createjs.Bitmap("../images/tiles/highlight.png"),
-    selectedTile: null,
     tiles: [],
+    textOverlays: [],
+    selectOutline: new createjs.Bitmap("/images/tiles/outline_selected.png"),
+    hoverOutline: new createjs.Bitmap("/images/tiles/outline_hover.png"),
+    greenOutline: new createjs.Bitmap("/images/tiles/outline_green.png"),
+    whiteOutline: new createjs.Bitmap("/images/tiles/outline_hover.png"),
+    redOutline: new createjs.Bitmap("/images/tiles/outline_red.png"),
+    selectedTile: null,
+    hoveredTile: null,
+
+    teamName: "spectate",
 
     create: function() {
         var cols = 15;
@@ -90,13 +97,21 @@ var Board = {
         return {r: r_dmg, b: b_dmg};
     },
     
-    refreshDamageOverlays: function(i, j) {
-        stage.removeChild(Board.tileHighlight);
-        Board.tileHighlight.x = Board.tiles[i][j].x;
-        Board.tileHighlight.y = Board.tiles[i][j].y;
-        stage.addChild(Board.tileHighlight);
-        var l = Board.texts.length;
-        for (var c = 0; c < l; c++) { stage.removeChild(Board.texts.pop()); }
+    refreshOverlays: function(i, j) {
+        stage.removeChild(Board.hoverOutline);
+        stage.removeChild(Board.selectOutline);
+        //determine the color of the hover outline
+
+        Board.hoverOutline.x = Board.tiles[i][j].x;
+        Board.hoverOutline.y = Board.tiles[i][j].y;
+        if (Board.selectedTile != null) {
+            Board.selectOutline.x = Board.selectedTile.x;
+            Board.selectOutline.y = Board.selectedTile.y;
+            stage.addChild(Board.selectOutline);
+        }
+        stage.addChild(Board.hoverOutline);
+        var l = Board.textOverlays.length;
+        for (var c = 0; c < l; c++) { stage.removeChild(Board.textOverlays.pop()); }
         var adj = Board.adjacent(i, j, true, 1);
         
         for (var c = 0; c < adj.length; c++) {
@@ -108,7 +123,7 @@ var Board = {
             txt.x = hex.x + 25;
             txt.y = hex.y + 20;
             stage.addChild(txt);
-            Board.texts.push(txt);
+            Board.textOverlays.push(txt);
         }
         
         stage.update();
@@ -172,12 +187,15 @@ var Tile = {
         var hex = new createjs.Bitmap("/images/tiles/"+tile_type.img);
         hex.type = tile_type;
         hex.value = -1;
-        hex.i = i;
-        hex.j = j;
+        hex.i = i; hex.j = j;
         hex.name = tile_type.img;
         //define the interactive events
         hex.addEventListener("mouseover", function(evt) {
-            Board.refreshDamageOverlays(evt.target.i, evt.target.j);
+            Board.refreshOverlays(evt.target.i, evt.target.j);
+        });
+        hex.addEventListener("click", function(evt) {
+            Board.selectedTile = hex;
+            Board.refreshOverlays(evt.target.i, evt.target.j);
         });
         return hex;
     },

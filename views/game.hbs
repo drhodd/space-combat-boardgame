@@ -34,6 +34,7 @@
 <script>
     var gameID = "{{gameID}}";
     var teamID = "{{teamID}}";
+    var teamName = "{{teamName}}";
     var socketID = "";
     var io = io("/"+gameID);
     
@@ -51,23 +52,31 @@
     });
     
     io.on("chat", function(message) {
-        var msg = message.content;
-        var sender = message.sender;
-        var chat_dom = document.getElementById("chat");
-        var chats = chat_dom.innerHTML.split("<br>");
-        if (chats.length > 23) chat_dom.innerHTML = chat_dom.innerHTML.replace(chats[0]+"<br>", "");
-            
-        chat_dom.innerHTML += "<b>"+"Player"+"</b>: <text style = 'color: gray;'>"+msg+"</text><br>";
+        showMessage("chat", message);
     });
     
 </script>
 
 <script>
+
     var chatbox = document.getElementById('chatbox');
     chatbox.onkeydown = function(event) {
-        if (event.keyCode == 13 && chatbox.value.length > 0) {
-            io.emit("chat", {content: chatbox.value});
-            chatbox.value = "";
-        }
+        if (event.keyCode == 13) { sendMessage(chatbox.value); chatbox.value = ""; }
     }
+
+    function sendMessage(message) {
+        if (message.length > 0) io.emit("chat", {content: message});
+    }
+
+    function showMessage(type, message) {
+        var msg = message.content;
+        var sender = message.sender;
+        var chat_dom = document.getElementById("chat");
+        var chats = chat_dom.innerHTML.split("<br>");
+        if (chats.length > 23) chat_dom.innerHTML = chat_dom.innerHTML.replace(chats[0]+"<br>", "");
+        chat_dom.innerHTML += "<b>"+sender+"</b>: <text style = 'color: '"+
+            (type == 'chat' ? 'red' : 'gray')+"';>"+msg+"</text><br>";
+        
+    }
+
 </script>
