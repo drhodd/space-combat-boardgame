@@ -20,7 +20,7 @@ function createTables() {
 
 function createGame(callback) {
     var random_url = Math.random().toString(36).substring(8);
-    var game = {url: random_url, red_url: "", blue_url: ""};
+    var game = {url: random_url, turn: "red"};
     var tile_entries = [
         {name: "RED_FLAGSHIP", x: 7, y: 0, game: random_url},
         {name: "RED_DESTROYER", x: 6, y: 0, game: random_url},
@@ -60,32 +60,10 @@ function createGame(callback) {
     insert("games", [game], function(err, result){
         if (err) { console.log("Failed to create game "+random_url+"!"); return; }
         insert("tiles", tile_entries, function(err, result) {
-            board.isTileEmpty(0, 0, random_url, function(boolean){console.log(boolean);});
             callback(err, result, random_url); //callback with the random URL
         });
     });
 
-}
-
-/**
- * Assigns a team to the specified game. Assigns red first, then blue.
- * Then it passes some information about the team in the callback function.
- * @param {String} gameURL The game ID.
- * @param {Function} callback Called if successful. 
- * Parameters are err (Error) and teamName (String).
- */
-function assignTeam(gameURL, callback) {
-    get("games", {url: gameURL}, function(err, result)  {
-        if (err) return; if (result.length == 0) return;
-        var randomTeamURL = Math.random().toString(36).substring(8);
-        console.log("Game: "+result);
-        var red = result[0].red_url != "";
-        var blue = result[0].blue_url != "";
-        console.log("Assigning team to game "+gameURL+": "+red+", "+blue);
-        if (!red) { update("games", {url: gameURL}, {red_url: randomTeamURL}, callback(err, randomTeamURL)); return; }
-        if (!blue) { update("games", {url: gameURL}, {blue_url: randomTeamURL}, callback(err, randomTeamURL)); return; }
-        callback(err, "spectate");
-    });
 }
 
 function update(collectionName, query, new_values, callback) {
@@ -124,4 +102,3 @@ module.exports.connect = connect;
 module.exports.createGame = createGame;
 module.exports.insert = insert;
 module.exports.get = get;
-module.exports.assignTeam = assignTeam;

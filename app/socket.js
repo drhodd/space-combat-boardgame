@@ -1,3 +1,4 @@
+var board = require('../app/board.js');
 var io; var namespaces = [];
 var database = require('../app/database.js');
 
@@ -13,35 +14,20 @@ function createNamespace(gameID) {
     //these are for convenience; the socket server needs to know (for example)
     //the usernames of each socket id, and the team they are associated with
     var ns = "/"+gameID;
-    if (namespaces.includes(ns)) return;
+    if (namespaces.includes(ns)) { console.log("Socket channel for game "+gameID+" already exists!"); return; }
     console.log("Creating socket channel for game "+gameID);
     var gamespace = io.of(ns);
     var usernames = new Map(); //map socket connections to usernames
-    var red_url = ""; var blue_url = "";
-    var userteams = new Map();
-    var teamcolors = new Map();
-
-    //retrieve the game document in the DB and find the team URLs
-    database.get("games", {url: gameID}, function(err, docs) {
-        if (err || docs.length == 0) {
-            console.log("Could not retrieve team data while creating namespace for "+gameID+"!");
-            return;
-        }
-        var doc = docs[0];
-        red_url = doc.red_url;
-        blue_url = doc.blue_url;
-        teamcolors.set(doc.red_url, "red");
-        teamcolors.set(doc.blue_url, "cyan");
-        teamcolors.set("", "black");
-        teamcolors.set("spectate", "black");
-        console.log("Red URL: "+red_url);
-        console.log("Blue URL: "+blue_url);
-    });
+    var userteams = new Map(); //map socket IDs to teams
+    var teamcolors = new Map(); //map team IDs to colors
+    teamcolors.set("red", "red");
+    teamcolors.set("blue", "cyan");
+    teamcolors.set("none", "black");
     
     gamespace.on('connection', function(socket) {
         
         usernames.set(socket.id, "Guest"+Math.floor(Math.random()*100000));
-        userteams.set(socket.id, "spectate");
+        userteams.set(socket.id, "none");
         gamespace.emit("chat", 
                 {sender: "Server", contents: usernames.get(socket.id)+" has connected.", color: "gray"});
         console.log(usernames.get(socket.id)+" has connected to "+gameID+" [ID: "+socket.id+"]");
@@ -67,6 +53,20 @@ function createNamespace(gameID) {
                     gamespace.emit("chat", {sender: "Server", 
                         contents: usernames.get(socket.id)+" has set their nickname to "+cmd[1]+".", color: "gray"});
                     usernames.set(socket.id, cmd[1]);
+                } else if (cmd[0] == "/join") {
+                    var teamID = cmd[1]; //"red" or "blue"
+                    userteams.set(socket.id, teamID);
+                    console.log(usernames.get(socket.id)+" wants to change teams to "+teamID+" (color: "+teamcolors.get(teamID)+")");
+                    var m = usernames.get(socket.id)+
+                            (teamID == "red" ? " has been assigned to the red team!" 
+                                : (teamID == "blue" ? " has been assigned to the blue team!" 
+                                    : " is spectating!"));
+                    console.log(m); gamespace.emit("chat", {sender: "Server", contents: m, color: "gray"});
+                } else if (cmd[0] == "/info") {
+                    var x = Number(cmd[1]), y = Number(cmd[2]);
+                    board.isTileEmpty(x, y, gameID, function(result) {
+                        socket.emit("chat", {contents: "Tile empty: "+result, sender: "Server", color: "gray"});
+                    });
                 }
             } else {
                 //send as chat
@@ -83,16 +83,6 @@ function createNamespace(gameID) {
                 console.log("Sending board data to "+usernames.get(socket.id)+" [ID: "+socket.id+"]");
                 socket.emit("board", docs);
             });
-        });
-
-        socket.on("join team", function(teamID) {
-            userteams.set(socket.id, teamID);
-            console.log(usernames.get(socket.id)+" wants to change teams to "+teamID+" (color: "+teamcolors.get(teamID)+")");
-            var m = usernames.get(socket.id)+
-                    (teamID == red_url ? " has been assigned to the red team!" 
-                        : (teamID == blue_url ? " has been assigned to the blue team!" 
-                            : " is spectating!"));
-            console.log(m); gamespace.emit("chat", {sender: "Server", contents: m, color: "gray"});
         });
         
     });

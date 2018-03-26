@@ -33,14 +33,12 @@
 <script src="/socket.io/socket.io.js"></script>
 <script>
     var gameID = "{{gameID}}";
-    var teamID = "{{teamID}}";
     var teamName = "{{teamName}}";
     var io = io("/"+gameID);
     
     io.on("connect", function(message) {
         console.log("Connected to socket server as "+message+"!");
         io.emit("board request", gameID);
-        io.emit("join team", teamID);
     });
     
     io.on("board", function(tiles) {

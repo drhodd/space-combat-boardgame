@@ -43,16 +43,6 @@ app.get('/new', (request, response) => {
 
 app.get('/game/:gameID', (request, response) => {
     var gameID = request.params.gameID;
-    database.assignTeam(gameID, function(err, teamID) {
-        response.render("redirect", {
-            url: "/game/"+gameID+"/"+teamID
-        });
-    });
-});
-
-app.get('/game/:gameID/:teamID', (request, response) => {
-    var gameID = request.params.gameID;
-    var teamID = request.params.teamID;
     database.get("games", {url: gameID}, function(err, docs) {
         if (err || docs.length == 0) { 
             console.log("A game with ID "+gameID+" was not found!");
@@ -62,8 +52,7 @@ app.get('/game/:gameID/:teamID', (request, response) => {
             socket.createNamespace(gameID); //create the socket namespace for the game
             response.render("game", {
                 layout: "createjs",
-                gameID: gameID,
-                teamID: teamID
+                gameID: gameID
             });
         }
     });

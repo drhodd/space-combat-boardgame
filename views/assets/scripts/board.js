@@ -12,7 +12,7 @@ var Board = {
     selectedTile: null,
     hoveredTile: null,
 
-    teamName: "spectate",
+    team: "none",
 
     create: function() {
         var cols = 15;
