@@ -53,14 +53,13 @@ app.get('/game/:gameID', (request, response) => {
 app.get('/game/:gameID/:teamID', (request, response) => {
     var gameID = request.params.gameID;
     var teamID = request.params.teamID;
-    socket.createNamespace(gameID); //create the socket namespace for the game
     database.get("games", {url: gameID}, function(err, docs) {
         if (err || docs.length == 0) { 
             console.log("A game with ID "+gameID+" was not found!");
             response.render("404", {});
             return; 
         } else {
-            database.get
+            socket.createNamespace(gameID); //create the socket namespace for the game
             response.render("game", {
                 layout: "createjs",
                 gameID: gameID,

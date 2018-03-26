@@ -3,6 +3,7 @@ var url = "mongodb://localhost";
 var database;
 var Tile = require('../app/tiles.js');
 var socket = require('../app/socket.js');
+var board = require('../app/board.js');
 
 function connect() {
     MongoClient.connect(url, function(err, db) {
@@ -59,6 +60,7 @@ function createGame(callback) {
     insert("games", [game], function(err, result){
         if (err) { console.log("Failed to create game "+random_url+"!"); return; }
         insert("tiles", tile_entries, function(err, result) {
+            board.isTileEmpty(0, 0, random_url, function(boolean){console.log(boolean);});
             callback(err, result, random_url); //callback with the random URL
         });
     });
@@ -74,14 +76,15 @@ function createGame(callback) {
  */
 function assignTeam(gameURL, callback) {
     get("games", {url: gameURL}, function(err, result)  {
+        if (err) return; if (result.length == 0) return;
         var randomTeamURL = Math.random().toString(36).substring(8);
-        var red = result[0].red_url.length != "";
-        var blue = result[0].blue_url.length != "";
+        console.log("Game: "+result);
+        var red = result[0].red_url != "";
+        var blue = result[0].blue_url != "";
         console.log("Assigning team to game "+gameURL+": "+red+", "+blue);
-        update("games", {url: gameURL}, 
-            (!red ? {red_url: randomTeamURL} 
-                : (!blue ? {blue_url: randomTeamURL} : {})));
-        callback(err, (red && blue ? "spectate" : randomTeamURL));
+        if (!red) { update("games", {url: gameURL}, {red_url: randomTeamURL}, callback(err, randomTeamURL)); return; }
+        if (!blue) { update("games", {url: gameURL}, {blue_url: randomTeamURL}, callback(err, randomTeamURL)); return; }
+        callback(err, "spectate");
     });
 }
 
@@ -92,9 +95,9 @@ function update(collectionName, query, new_values, callback) {
     }
     var collection = database.collection(collectionName);
     collection.update(query, {$set: new_values}, function(err, result) {
+        console.log("Updating entries "+[result]+"!");
         if (err) { console.log("There was an error updating collection "+collectionName+"! "
-                        +err.message); return; }
-        console.log("Updated first document matching "+query+" with values "+new_values+"!");
+                        +err.message); }
         if (callback) callback(err, result);
     });
 }
@@ -102,8 +105,7 @@ function update(collectionName, query, new_values, callback) {
 function insert(collectionName, entries, callback) {
     var collection = database.collection(collectionName);
     collection.insertMany(entries, function(err, result) {
-        if (err) return;
-        console.log("Inserted "+entries.length+" documents into collection '"+collectionName+"'");
+        if (err) { console.log(err.message); }
         callback(err, result);
     });
 };
@@ -113,9 +115,7 @@ function get(collectionName, query, callback) {
     var collection = database.collection(collectionName);
     // Find some entries that match
     collection.find(query).toArray(function(err, docs) {
-        if (err) return;
-        console.log("Found the following records:");
-        console.log(docs);
+        if (err) { console.log(err.message); }
         callback(err, docs); //perform the defined action on the results (the docs)
     });
 };

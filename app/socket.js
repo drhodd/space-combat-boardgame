@@ -10,14 +10,14 @@ function init(socketIO) {
 }
 
 function createNamespace(gameID) {
-
     //these are for convenience; the socket server needs to know (for example)
     //the usernames of each socket id, and the team they are associated with
     var ns = "/"+gameID;
     if (namespaces.includes(ns)) return;
+    console.log("Creating socket channel for game "+gameID);
     var gamespace = io.of(ns);
     var usernames = new Map(); //map socket connections to usernames
-    var red_url = "", blue_url = "";
+    var red_url = ""; var blue_url = "";
     var userteams = new Map();
     var teamcolors = new Map();
 
@@ -34,26 +34,32 @@ function createNamespace(gameID) {
         teamcolors.set(doc.blue_url, "cyan");
         teamcolors.set("", "black");
         teamcolors.set("spectate", "black");
+        console.log("Red URL: "+red_url);
+        console.log("Blue URL: "+blue_url);
     });
     
     gamespace.on('connection', function(socket) {
         
-        console.log(socket.id+" has connected to "+ns);
         usernames.set(socket.id, "Guest"+Math.floor(Math.random()*100000));
         userteams.set(socket.id, "spectate");
         gamespace.emit("chat", 
                 {sender: "Server", contents: usernames.get(socket.id)+" has connected.", color: "gray"});
+        console.log(usernames.get(socket.id)+" has connected to "+gameID+" [ID: "+socket.id+"]");
         
         socket.on('disconnect', function(){
             gamespace.emit("chat", 
                 {sender: "Server", contents: usernames.get(socket.id)+" has disconnected.", color: "gray"});
+            console.log(usernames.get(socket.id)+" has disconnected from game "+gameID);
             usernames.delete(socket.id);
             userteams.delete(socket.id);
         });
 
         socket.on('chat', function(message) {
-            console.log(socket.id+" @ "+ns+": "+message);
-            if (!message.indexOf) { console.log(message+" is not a valid message!"); return; }
+            console.log(usernames.get(socket.id)
+                +" (game: "+gameID+", team: "
+                    +userteams.get(socket.id)+", color: "
+                        +teamcolors.get(userteams.get(socket.id))+"): "+message);
+            if (!message instanceof String) { console.log(message+" is not a valid message!"); return; }
             if (message.indexOf("/") == 0) {
                 //is command, split into name and params
                 var cmd = message.split(" ");
@@ -74,13 +80,14 @@ function createNamespace(gameID) {
             console.log(socket.id+" @ "+ns+" requested the board contents for "+gameID+".");
             database.get("tiles", {game: gameID}, function(err, docs) {
                 if (err) return;
-                console.log("Sending board data to "+socket.id+"!");
+                console.log("Sending board data to "+usernames.get(socket.id)+" [ID: "+socket.id+"]");
                 socket.emit("board", docs);
             });
         });
 
         socket.on("join team", function(teamID) {
             userteams.set(socket.id, teamID);
+            console.log(usernames.get(socket.id)+" wants to change teams to "+teamID+" (color: "+teamcolors.get(teamID)+")");
             var m = usernames.get(socket.id)+
                     (teamID == red_url ? " has been assigned to the red team!" 
                         : (teamID == blue_url ? " has been assigned to the blue team!" 
