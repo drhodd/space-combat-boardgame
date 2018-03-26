@@ -40,7 +40,7 @@
     io.on("connect", function(message) {
         console.log("Connected to socket server as "+message+"!");
         io.emit("board request", gameID);
-        io.emit("team name request", teamID);
+        io.emit("join team", teamID);
     });
     
     io.on("board", function(tiles) {
@@ -75,8 +75,7 @@
         var chat_dom = document.getElementById("chat");
         var chats = chat_dom.innerHTML.split("<br>");
         if (chats.length > 23) chat_dom.innerHTML = chat_dom.innerHTML.replace(chats[0]+"<br>", "");
-        chat_dom.innerHTML += "<section style = '"+('color: '+message.color)+"'><b>" + sender + "</b>: " + msg + "<br>";
-        
+        chat_dom.innerHTML += "<b style = '"+('color: '+message.color)+"'>" + sender + "</b>: " + msg + "<br>";
     }
 
 </script>
