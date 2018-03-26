@@ -24,6 +24,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.use('/images',express.static(path.join(__dirname, 'views/assets/images')));
 app.use('/css',express.static(path.join(__dirname, 'views/assets/stylesheets')));
 app.use('/scripts',express.static(path.join(__dirname, 'views/assets/scripts')));
+app.use('/audio',express.static(path.join(__dirname, 'views/assets/audio')));
 
 /*HTTP REQUEST HANDLERS*/
 

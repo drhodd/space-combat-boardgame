@@ -35,12 +35,12 @@
     var gameID = "{{gameID}}";
     var teamID = "{{teamID}}";
     var teamName = "{{teamName}}";
-    var socketID = "";
     var io = io("/"+gameID);
     
     io.on("connect", function(message) {
         console.log("Connected to socket server as "+message+"!");
-        io.emit("board", gameID);
+        io.emit("board request", gameID);
+        io.emit("team name request", teamID);
     });
     
     io.on("board", function(tiles) {
@@ -53,6 +53,7 @@
     
     io.on("chat", function(message) {
         showMessage("chat", message);
+        console.log(message.sender+": "+message.contents);
     });
     
 </script>
@@ -65,17 +66,16 @@
     }
 
     function sendMessage(message) {
-        if (message.length > 0) io.emit("chat", {content: message});
+        if (message.length > 0) io.emit("chat", message);
     }
 
     function showMessage(type, message) {
-        var msg = message.content;
+        var msg = message.contents;
         var sender = message.sender;
         var chat_dom = document.getElementById("chat");
         var chats = chat_dom.innerHTML.split("<br>");
         if (chats.length > 23) chat_dom.innerHTML = chat_dom.innerHTML.replace(chats[0]+"<br>", "");
-        chat_dom.innerHTML += "<b>"+sender+"</b>: <text style = 'color: '"+
-            (type == 'chat' ? 'red' : 'gray')+"';>"+msg+"</text><br>";
+        chat_dom.innerHTML += "<section style = '"+('color: '+message.color)+"'><b>" + sender + "</b>: " + msg + "<br>";
         
     }
 
