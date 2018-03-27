@@ -77,15 +77,6 @@ var Board = {
         return Board.tiles[i][j].type;
     },
     
-    distance: function(i, j, i2, j2) {
-        if (i == i2 && j == j2) return 0;
-        for (var a = 1; a < Board.cols; a++) {
-            var adj = Common.getAdjacent(i, j, true, a);
-            if (adj.includes({i: i2, j: j2})) return a;
-        }
-        return -1;
-    },
-    
     damageAt: function(i, j) {
         var r_dmg = 0, b_dmg = 0;
         var adj = Common.getAdjacent(i, j, false, 4);
@@ -120,7 +111,7 @@ var Board = {
             if (adj[c] == null) continue;
             var hex = Board.tiles[adj[c].i][adj[c].j]; if (hex == null) continue;
             var dmg = Board.damageAt(hex.i, hex.j).b;
-            var dist = Board.distance(i, j, hex.i, hex.j);
+            var dist = Common.distance(i, j, hex.i, hex.j);
             var txt = new createjs.Text(dmg, "20px Verdana", "#ffffff");
             txt.x = hex.x + 25;
             txt.y = hex.y + 20;

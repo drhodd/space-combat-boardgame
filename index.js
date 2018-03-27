@@ -11,9 +11,6 @@ const server = require('http').createServer(app);
 const socket = require("./app/socket.js");
 socket.init(require('socket.io')(server));
 
-const common = require('./app/common/common.js');
-console.log(common.getAdjacent(0, 0, false, 1));
-
 /*Set the Handlebars options*/
 app.engine('.hbs', exphbs({
       defaultLayout: 'main',

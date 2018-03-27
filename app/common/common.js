@@ -2,18 +2,26 @@ var isModule = typeof module != 'undefined';
 //Board will be defined if loading from HTML
 var board = isModule ? require("../board.js") : Board;
 
+var distance = function(i, j, i2, j2) {
+    if (i == i2 && j == j2) return 0;
+    for (var a = 1; a < board.cols; a++) {
+        var adj = getAdjacent(i, j, true, a);
+        if (contains(i2, j2, adj)) return a;
+    }
+    return -1;
+}
+
+function contains(ti, tj, array) { 
+    for (var c = 0; c < array.length; c++) 
+        if (array[c] != null)
+                if (array[c].i == ti && array[c].j == tj)
+                    return true;
+    return false;
+}
+
 var getAdjacent = function(i, j, include_origin, radius) {
 
     var adj = include_origin ? [{i: i, j: j}] : [];
-
-    //inner function to test if adj contains the coordinate pair
-    function contains(ti, tj) { 
-        for (var c = 0; c < adj.length; c++) 
-            if (adj[c] != null)
-                    if (adj[c].i == ti && adj[c].j == tj)
-                        return true;
-        return false;
-    }
     //inner function to get the # of rows in a column
     var rows = function(i) { return board.cols - Math.abs(board.mid - i); };
     //inner function to get the x and y directions for a specified compass dir
@@ -94,9 +102,11 @@ var Common;
 if (!isModule) {
     console.log("No module! Exporting as standard Javascript.");
     Common = {
-        getAdjacent: getAdjacent    
+        getAdjacent: getAdjacent,
+        distance: distance   
     };
 } else {
     console.log("Module detected. Exporting as module.");
     module.exports.getAdjacent = getAdjacent;
+    module.exports.distance = distance;
 }
