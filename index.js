@@ -11,6 +11,9 @@ const server = require('http').createServer(app);
 const socket = require("./app/socket.js");
 socket.init(require('socket.io')(server));
 
+const common = require('./app/common/common.js');
+console.log(common.getAdjacent(0, 0, false, 1));
+
 /*Set the Handlebars options*/
 app.engine('.hbs', exphbs({
       defaultLayout: 'main',
@@ -25,6 +28,7 @@ app.use('/images',express.static(path.join(__dirname, 'views/assets/images')));
 app.use('/css',express.static(path.join(__dirname, 'views/assets/stylesheets')));
 app.use('/scripts',express.static(path.join(__dirname, 'views/assets/scripts')));
 app.use('/audio',express.static(path.join(__dirname, 'views/assets/audio')));
+app.use('/common',express.static(path.join(__dirname, 'app/common')));
 
 /*HTTP REQUEST HANDLERS*/
 

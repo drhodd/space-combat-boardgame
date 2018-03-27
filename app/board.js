@@ -10,3 +10,5 @@ function isTileEmpty(i, j, gameID, callback) {
 }
 
 module.exports.isTileEmpty = isTileEmpty;
+module.exports.cols = cols;
+module.exports.mid = mid;

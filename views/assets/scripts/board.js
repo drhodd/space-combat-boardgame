@@ -80,7 +80,7 @@ var Board = {
     distance: function(i, j, i2, j2) {
         if (i == i2 && j == j2) return 0;
         for (var a = 1; a < Board.cols; a++) {
-            var adj = Board.adjacent(i, j, true, a);
+            var adj = Common.getAdjacent(i, j, true, a);
             if (adj.includes({i: i2, j: j2})) return a;
         }
         return -1;
@@ -88,7 +88,7 @@ var Board = {
     
     damageAt: function(i, j) {
         var r_dmg = 0, b_dmg = 0;
-        var adj = Board.adjacent(i, j, false, 4);
+        var adj = Common.getAdjacent(i, j, false, 4);
         for (var c = 0; c < adj.length; c++) {
             if (adj[c] == null) continue;
             var type = Board.tiles[adj[c].i][adj[c].j].type;
@@ -113,9 +113,9 @@ var Board = {
         stage.addChild(Board.hoverOutline);
         var l = Board.textOverlays.length;
         for (var c = 0; c < l; c++) { stage.removeChild(Board.textOverlays.pop()); }
-        var adj = Board.adjacent(i, j, false, 1);
+        var adj = Common.getAdjacent(i, j, true, 3);
         
-        /*for (var c = 0; c < adj.length; c++) {
+        for (var c = 0; c < adj.length; c++) {
             //create text overlay
             if (adj[c] == null) continue;
             var hex = Board.tiles[adj[c].i][adj[c].j]; if (hex == null) continue;
@@ -126,109 +126,20 @@ var Board = {
             txt.y = hex.y + 20;
             stage.addChild(txt);
             Board.textOverlays.push(txt);
-        }*/
+        }
 
         for (var c = 0; c < Board.cols; c++) {
             for (var r = 0; r < Board.tiles[c].length; r++) {
                 var hex = Board.tiles[c][r]; if (hex == null) continue;
-                var txt = new createjs.Text(hex.i+", "+hex.j, "20px Verdana", "#ffffff");
-                txt.x = hex.x + 25;
-                txt.y = hex.y + 20;
+                var txt = new createjs.Text(hex.i+", "+hex.j, "10px Verdana", "#ffffff");
+                txt.x = hex.x + 10;
+                txt.y = hex.y + 10;
                 stage.addChild(txt);
                 Board.textOverlays.push(txt);
             }
         }
         
         stage.update();
-    },
-
-    /**
-     * Get all adjacent tiles with in the specified radius.
-     * Returns {i, j} objects.
-     */
-    adjacent: function(i, j, include_origin, radius, debug) {
-
-        var adj = include_origin ? [{i: i, j: j}] : [];
-
-        //inner function to test if adj contains the coordinate pair
-        function contains(ti, tj) { 
-            for (var c = 0; c < adj.length; c++) 
-                if (adj[c] != null)
-                        if (adj[c].i == ti && adj[c].j == tj)
-                            return true;
-            return false;
-        }
-        //inner function to get the # of rows in a column
-        var rows = function(i) { return Board.cols - Math.abs(Board.mid - i); };
-        //inner function to get the x and y directions for a specified compass dir
-        //it changes based on the column (i) due to the array structure
-        var dirs = function(i, dir) {
-            var dx = ((dir == 'NW' || dir == 'SW') ? -1 : ((dir == 'NE' || dir == 'SE') ? 1 : 0));
-            var dy = 0;
-            switch (dir) {
-                case 'N':
-                    //console.log("Nortth!!!!");
-                    dy = -1;
-                    break;
-                case 'S':
-                    dy = 1;
-                    break;
-                case 'NW':
-                    dy = i <= Board.mid ? -1 : 0;
-                    break;
-                case 'SW':
-                    dy = i < Board.mid ? 0 : 1;
-                    break;
-                case 'NE':
-                    dy = i < Board.mid ? 0 : -1;
-                    break;
-                case 'SE':
-                    dy = i < Board.mid ? 1 : 0;
-                    break;
-            }
-            return {dx: dx, dy: dy};
-        }
-
-        //inner function that traverses linearly in the direction specified, for the duration specified
-        //each tile it hits, it will add to the array
-        //returns the position it ended on (and last added to array)
-        var traverseFrom = function(pos, dir, dur, addEndTile, debug) {
-            if (debug) console.log("Traversing from "+pos.i+", "+pos.j+" in direction "+dir+" for "+dur+" tiles.");
-            var deltas = dirs(pos.i, dir);
-            var curr = {i: pos.i, j: pos.j};
-            for (var d = 0; d < dur; d++) {
-                //console.log("d: "+d+", dx: "+deltas.dx+", dy: "+deltas.dy+", dir: "+dir);
-                curr = {i: curr.i + deltas.dx, j: curr.j + deltas.dy};
-                if (debug) console.log("Added position "+curr.i+", "+curr.j);
-                adj.push(curr);
-            }
-            if (debug) console.log("Ended at position "+curr.i+", "+curr.j);
-            return curr;
-        }
-        //uses traverseFrom to add everything in a circle shape (hollow)
-        var circleFrom = function(pos, radius, debug) {
-            var se = traverseFrom(pos, "SE", radius, true, debug);
-            var s = traverseFrom(se, "S", radius, true, debug);
-            var sw = traverseFrom(s, "SW", radius, true, debug);
-            var nw = traverseFrom(sw, "NW", radius, true, debug);
-            var n2 = traverseFrom(nw, "N", radius, true, debug);
-            var ne = traverseFrom(n2, "NE", radius, false, debug);
-        }
-        //add multiple circles of tiles to the array
-        for (var r = 1; r < radius + 1; r++) circleFrom({i: i, j: j - r}, r, debug);
-
-        //filter out any positions that are out of range
-        return adj.filter(function(n) { 
-            if (n == undefined) {
-                return false;
-            } else {
-                console.log("Testing {"+(n.i+", "+n.j)+"} for filter.");
-                if ((n.i < 0 || n.i > Board.cols - 1 || n.j < 0 || n.j > rows(n.i) - 1))
-                    return false;
-                    else return true;
-            }
-        });
-
     }
     
 };
@@ -269,11 +180,11 @@ var Tile = {
         hex.name = tile_type.img;
         //define the interactive events
         hex.addEventListener("mouseover", function(evt) {
-            //Board.refreshOverlays(evt.target.i, evt.target.j);
+            Board.refreshOverlays(evt.target.i, evt.target.j);
         });
         hex.addEventListener("click", function(evt) {
             Board.selectedTile = hex;
-            //Board.refreshOverlays(evt.target.i, evt.target.j);
+            Board.refreshOverlays(evt.target.i, evt.target.j);
         });
         return hex;
     },

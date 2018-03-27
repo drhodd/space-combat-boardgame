@@ -10,6 +10,7 @@ function connect() {
         if (err) { console.log("Error connecting to database: "+err.message); return; }
         database = db.db("debris");
         createTables();
+        console.log("Board.cols "+board.cols);
     });
 }
 
