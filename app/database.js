@@ -103,3 +103,4 @@ module.exports.connect = connect;
 module.exports.createGame = createGame;
 module.exports.insert = insert;
 module.exports.get = get;
+module.exports.update = update;

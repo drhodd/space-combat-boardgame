@@ -3,12 +3,21 @@ var Tile = require("../app/tiles.js");
 
 var cols = 15, mid = 7;
 
-function isTileEmpty(i, j, gameID, callback) {
+function getTileData(i, j, gameID, callback) {
     database.get("tiles", {game: gameID, x: i, y: j}, function(err, results) {
-        callback(results.length == 0);
+        if (err) { callback({empty: true, name: "NEUTRAL"}); return; }
+        if (results.length == 0) { callback({empty: true, type: "NEUTRAL"}); return; }
+        callback({empty: false, name: results[0].name});
     });
 }
 
-module.exports.isTileEmpty = isTileEmpty;
+function moveTile(i, j, new_i, new_j, gameID, callback) {
+    database.update("tiles", {game: gameID, x: i, y: j}, {x: new_i, y: new_j}, function(err, result) {
+        callback(err);
+    });
+}
+
+module.exports.getTileData = getTileData;
 module.exports.cols = cols;
 module.exports.mid = mid;
+module.exports.moveTile = moveTile;

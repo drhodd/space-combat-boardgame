@@ -10,6 +10,10 @@ function init(socketIO) {
     });
 }
 
+/**
+ * Create and define event handlers for the socket namespace for the given gameID.
+ * @param {String} gameID 
+ */
 function createNamespace(gameID) {
     //these are for convenience; the socket server needs to know (for example)
     //the usernames of each socket id, and the team they are associated with
@@ -74,6 +78,19 @@ function createNamespace(gameID) {
                 gamespace.emit("chat", {sender: usernames.get(socket.id), contents: message, 
                     color: teamcolors.get(userteams.get(socket.id))});
             }
+        });
+
+        socket.on("move request", function(move) {
+            console.log("Received move request from "+usernames.get(socket.id));
+            board.getTileData(move.pos1.i, move.pos1.j, gameID, function(data){
+                console.log("Source tile: "+data.name);
+                board.moveTile(move.pos1.i, move.pos1.j, move.pos2.i, move.pos2.j, gameID, function(err) {
+                    if (err) { console.log("Error moving tile: "+err); return; }
+                    console.log("Moving tile!");
+                    gamespace.emit("tile update", move.pos1.i, move.pos1.j, "NEUTRAL");
+                    gamespace.emit("tile update", move.pos2.i, move.pos2.j, data.name);
+                });
+            });
         });
         
         socket.on("board request", function(gameID) {

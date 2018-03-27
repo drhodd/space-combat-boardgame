@@ -53,6 +53,10 @@
         showMessage("chat", message);
         console.log(message.sender+": "+message.contents);
     });
+
+    io.on("tile update", function(i, j, tileName) {
+        Board.update(i, j, Tile[tileName]);
+    });
     
 </script>
 

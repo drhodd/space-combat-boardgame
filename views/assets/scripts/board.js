@@ -174,7 +174,16 @@ var Tile = {
             Board.refreshOverlays(evt.target.i, evt.target.j);
         });
         hex.addEventListener("click", function(evt) {
-            Board.selectedTile = hex;
+            if (Board.selectedTile != null) {
+                io.emit("move request", {
+                    pos1: {i: Board.selectedTile.i, j: Board.selectedTile.j}, 
+                    pos2: {i: hex.i, j: hex.j}
+                });
+                Board.selectedTile = null;
+            } else {
+                Board.selectedTile = hex;
+            }
+            
             Board.refreshOverlays(evt.target.i, evt.target.j);
         });
         return hex;
