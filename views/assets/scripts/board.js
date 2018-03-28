@@ -35,7 +35,7 @@ var Board = {
         createjs.Ticker.setFPS(60);
         createjs.Ticker.addEventListener("tick", stage);
         stage.update();
-        this.refreshOverlays();
+        this.refreshOverlays(false);
     },
     
     performLoadAnimation: function() {
@@ -90,7 +90,7 @@ var Board = {
                 .to({ alpha: 0 }, 0, createjs.Ease.getPowInOut(2))
                 .to({ alpha: 1 }, 400, createjs.Ease.getPowInOut(2));
         stage.addChild(grid[i][j]);
-        Board.refreshOverlays();
+        Board.refreshOverlays(layer == 'ship');
     },
 
     damageAt: function(i, j) {
@@ -112,12 +112,18 @@ var Board = {
         return {x: i * 50, y: (j * 56) + (dist * (56/2))};
     },
     
-    refreshOverlays: function() {
+    refreshOverlays: function(includeProjections) {
 
         var l = Board.overlayElements.length;
-        for (var c = 0; c < l; c++) { stage.removeChild(Board.overlayElements.pop()); }
+        for (var c = l - 1; c > -1; c--) {
+            //check if the element is marked as a projection
+            var projection = typeof Board.overlayElements[c].projection != 'undefined';
+            if (!projection || (projection && includeProjections)) 
+                stage.removeChild(Board.overlayElements.pop()); 
+        }
 
         function projectAround(ship, radius, mode) {
+            if (!includeProjections) return; //don't render projections if you aren't supposed to
             var adjToSelection = Common.getAdjacent(ship.i, ship.j, true, radius);
             adjToSelection.forEach(element => {
                 var shipTeam = ship.type.team;
@@ -127,6 +133,7 @@ var Board = {
                         if (mode.includes("movement")) tile_ = Tile.GREEN;
                         if (mode.includes("attack")) tile_ = shipTeam == "red" ? Tile.RED : Tile.BLUE;
                         var hex = Tile.create(element.i, element.j, tile_, 'overlay');
+                        hex.projection = true;
                         Board.overlayElements.push(hex);
                     }
                     var icon_shown = false;
@@ -134,6 +141,7 @@ var Board = {
                         var damages = Board.damageAt(element.i, element.j);
                         var death = (shipTeam == "red" ? damages.blue : damages.red) >= ship.type.s;
                         var hex = Tile.create(element.i, element.j, Tile.DEATH, 'overlay');
+                        hex.projection = true;
                         if (death) { Board.overlayElements.push(hex); icon_shown = death; }
                     }
                     if (mode.includes("damage") && !icon_shown) {
@@ -144,6 +152,7 @@ var Board = {
                         var osc = Board.toOSC(element.i, element.j);
                         text.x = osc.x + 37.5 - (text.getMeasuredWidth() / 2); 
                         text.y = osc.y + 37.5 - (text.getMeasuredHeight() / 2);
+                        text.projection = true;
                         Board.overlayElements.push(text);
                     }
                 }
@@ -201,7 +210,7 @@ var Board = {
 
     toggleDebug: function() {
         Board.debug = !Board.debug;
-        Board.refreshOverlays();
+        Board.refreshOverlays(true);
     }
     
 };
@@ -250,7 +259,7 @@ var Tile = {
         //define the interactive events
         hex.on("mouseover", function(evt) {
             Board.hoverTile = hex;
-            Board.refreshOverlays();
+            Board.refreshOverlays(false);
         });
         hex.addEventListener("click", function(evt) {
 
@@ -291,7 +300,7 @@ var Tile = {
             }
             if (layer == 'ship') onClickShip();
             if (layer == 'board') onClickBoard();
-            Board.refreshOverlays();
+            Board.refreshOverlays(true);
             
         });
         return hex;
