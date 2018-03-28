@@ -5,8 +5,7 @@ var Board = {
 
     boardTiles: [],
     shipTiles: [],
-    overlayTiles: [],
-    textOverlays: [],
+    overlayElements: [],
     selectOutline: new createjs.Bitmap("/images/tiles/outline_selected.png"),
     hoverOutline: new createjs.Bitmap("/images/tiles/outline_hover.png"),
     greenOutline: new createjs.Bitmap("/images/tiles/outline_green.png"),
@@ -24,14 +23,11 @@ var Board = {
         for (i = 0; i < cols; i++) {
             Board.shipTiles[i] = [];
             Board.boardTiles[i] = [];
-            Board.overlayTiles[i] = [];
             for (j = 0; j < rows; j++) {
                 var neutral = Tile.create(i, j, Tile.NEUTRAL, 'board');
                 var none = Tile.create(i, j, Tile.NONE, 'ship');
-                var none2 = Tile.create(i, j, Tile.NONE, 'overlay');
                 Board.boardTiles[i].push(neutral);
                 Board.shipTiles[i].push(none);
-                Board.overlayTiles[i].push(none2);
                 stage.addChild(neutral);
             }
             rows += i >= ((cols-1)/2) ? -1 : 1;
@@ -61,7 +57,7 @@ var Board = {
             Board.update(i, j, Tile.NONE, 'ship');
             Board.update(i2, j2, ship.type, 'ship');
             createjs.Tween.get(Board.shipTiles[i2][j2], { override: true, loop: true })
-                .to({ alpha: .25 }, 500, createjs.Ease.getPowInOut(4))
+                .to({ alpha: .25 }, 500, createjs.Ease.getPowInOut(2))
                 .to({ alpha: 1 }, 500, createjs.Ease.getPowInOut(2));
             createjs.Tween.get(Board.shipTiles[i][j], { override: true, loop: false })
                 .to({ alpha: 0 }, 200, createjs.Ease.getPowInOut(4));
@@ -74,8 +70,8 @@ var Board = {
     },
     
     update: function(i, j, type, layer) {
-        var grid = layer == 'ship' 
-            ? Board.shipTiles : (layer == 'board' ? Board.boardTiles : Board.overlayTiles);
+        console.log("Updating board: "+i+", "+j+", "+type+", "+layer);
+        var grid = layer == 'ship' ? Board.shipTiles : Board.boardTiles;
         var old_hex = grid[i][j];
         grid[i][j] = Tile.create(i, j, type, layer);
         grid[i][j].x = old_hex.x;
@@ -112,35 +108,51 @@ var Board = {
     
     refreshOverlays: function() {
 
-        stage.removeChild(Board.hoverOutline);
-        stage.removeChild(Board.selectOutline);
+        var l = Board.overlayElements.length;
+        for (var c = 0; c < l; c++) { stage.removeChild(Board.overlayElements.pop()); }
         
         //control hover/select overlay
         if (Board.hoverTile != null) {
             Board.hoverOutline.x = Board.hoverTile.x;
             Board.hoverOutline.y = Board.hoverTile.y;
-            stage.addChild(Board.hoverOutline);
+            Board.overlayElements.push(Board.hoverOutline);
         }
         if (Board.selectedTile != null) {
             Board.selectOutline.x = Board.selectedTile.x;
             Board.selectOutline.y = Board.selectedTile.y;
-            stage.addChild(Board.selectOutline);
+            Board.overlayElements.push(Board.selectOutline);
         }
+
+        var radiusOrigin = Board.previewTile != null ? Board.previewTile : Board.selectedTile;
+        if (radiusOrigin != null) {
+            var adjToSelection = Common.getAdjacent(radiusOrigin.i, radiusOrigin.j, false, 4);
+            adjToSelection.forEach(element => {
+                var selectedTeam = radiusOrigin.type.team;
+                if (Board.shipTiles[element.i][element.j].type == Tile.NONE) {
+                        var hex = Tile.create(element.i, element.j, 
+                            selectedTeam == "red" ? Tile.RED : Tile.BLUE, 'overlay');
+                        Board.overlayElements.push(hex);
+                }
+            });
+        }
+
         //debug text
         if (Board.debug) {
-            var l = Board.textOverlays.length;
-            for (var c = 0; c < l; c++) { stage.removeChild(Board.textOverlays.pop()); }
             for (var c = 0; c < Board.cols; c++) {
                 for (var r = 0; r < Board.shipTiles[c].length; r++) {
                     var hex = Board.shipTiles[c][r]; if (hex == null) continue;
                     var txt = new createjs.Text(hex.i+", "+hex.j, "10px Verdana", "#ffffff");
                     txt.x = hex.x + 10;
                     txt.y = hex.y + 10;
-                    stage.addChild(txt);
-                    Board.textOverlays.push(txt);
+                    Board.overlayElements.push(txt);
                 }
             }
         }
+
+        //add all
+        for (var c = 0; c < Board.overlayElements.length; c++) 
+            stage.addChild(Board.overlayElements[c]);
+
         //refresh the stage
         stage.update();
     },
@@ -191,6 +203,7 @@ var Tile = {
         hex.y = Board.toOSC(i, j).y;
         hex.name = tile_type.img;
 
+        if (layer == 'overlay') return hex;
         //define the interactive events
         hex.on("mouseover", function(evt) {
             Board.hoverTile = hex;

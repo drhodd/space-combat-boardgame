@@ -1,4 +1,4 @@
-<body onload="init();">
+<body>
     <div class = "main">
         <center>
             <canvas class = "canvas" width = "775px" height = "865px" id="canvas">
@@ -49,6 +49,7 @@
     
     io.on("board", function(tiles) {
         console.log("Recieved board data from server!");
+        init();
         for (var t = 0; t < tiles.length; t++) {
             console.log(tiles[t].name);
             Board.update(tiles[t].x, tiles[t].y, Tile[tiles[t].name], 'ship');
