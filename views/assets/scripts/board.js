@@ -92,13 +92,19 @@ var Board = {
         stage.addChild(grid[i][j]);
         Board.refreshOverlays();
     },
-    
-    valueAt: function(i, j) {
-        return Board.shipTiles[i][j].value;
-    },
-    
-    tileType: function(i, j) {
-        return Board.shipTiles[i][j].type;
+
+    damageAt: function(i, j) {
+        var r_dmg = 0, b_dmg = 0;
+        var adj = Common.getAdjacent(i, j, false, 4);
+        for (var c = 0; c < adj.length; c++) {
+            if (adj[c] == null) continue;
+            var dist = Common.distance(i, j, adj[c].i, adj[c].j);
+            var type = Board.shipTiles[adj[c].i][adj[c].j].type;
+            if (dist > 4) continue;
+            if (type.team == "red") r_dmg += dist <= 2 ? type.ds : type.dl;
+            if (type.team == "blue") b_dmg += dist <= 2 ? type.ds : type.dl;
+        }
+        return {red: r_dmg, blue: b_dmg};
     },
 
     toOSC: function(i, j) {
@@ -110,30 +116,53 @@ var Board = {
 
         var l = Board.overlayElements.length;
         for (var c = 0; c < l; c++) { stage.removeChild(Board.overlayElements.pop()); }
-        
-        //control hover/select overlay
-        if (Board.hoverTile != null) {
-            Board.hoverOutline.x = Board.hoverTile.x;
-            Board.hoverOutline.y = Board.hoverTile.y;
-            Board.overlayElements.push(Board.hoverOutline);
-        }
-        if (Board.selectedTile != null) {
-            Board.selectOutline.x = Board.selectedTile.x;
-            Board.selectOutline.y = Board.selectedTile.y;
-            Board.overlayElements.push(Board.selectOutline);
-        }
 
-        var radiusOrigin = Board.previewTile != null ? Board.previewTile : Board.selectedTile;
-        if (radiusOrigin != null) {
-            var adjToSelection = Common.getAdjacent(radiusOrigin.i, radiusOrigin.j, false, 4);
+        function projectAround(ship, radius, mode) {
+            var adjToSelection = Common.getAdjacent(ship.i, ship.j, true, radius);
             adjToSelection.forEach(element => {
-                var selectedTeam = radiusOrigin.type.team;
+                var shipTeam = ship.type.team;
                 if (Board.shipTiles[element.i][element.j].type == Tile.NONE) {
-                        var hex = Tile.create(element.i, element.j, 
-                            selectedTeam == "red" ? Tile.RED : Tile.BLUE, 'overlay');
+                    if (mode.includes("highlight")) {
+                        var tile_ = Tile.NONE;
+                        if (mode.includes("movement")) tile_ = Tile.GREEN;
+                        if (mode.includes("attack")) tile_ = shipTeam == "red" ? Tile.RED : Tile.BLUE;
+                        var hex = Tile.create(element.i, element.j, tile_, 'overlay');
                         Board.overlayElements.push(hex);
+                    }
+                    var icon_shown = false;
+                    if (mode.includes("icons")) {
+                        var damages = Board.damageAt(element.i, element.j);
+                        var death = (shipTeam == "red" ? damages.blue : damages.red) >= ship.type.s;
+                        var hex = Tile.create(element.i, element.j, Tile.DEATH, 'overlay');
+                        if (death) { Board.overlayElements.push(hex); icon_shown = death; }
+                    }
+                    if (mode.includes("damage") && !icon_shown) {
+                        var damages = Board.damageAt(element.i, element.j);
+                        var hi_val = damages.red > damages.blue ? damages.red : damages.blue;
+                        var hi_color = damages.red > damages.blue ? "#d3343c" : "#3464d3";
+                        var text = new createjs.Text(hi_val+"", "28px Arial", hi_color);
+                        var osc = Board.toOSC(element.i, element.j);
+                        text.x = osc.x + 37.5 - (text.getMeasuredWidth() / 2); 
+                        text.y = osc.y + 37.5 - (text.getMeasuredHeight() / 2);
+                        Board.overlayElements.push(text);
+                    }
                 }
             });
+        }
+
+        //draw radius highlights around ships
+        if (Board.previewTile != null) {
+            if (Board.selectedTile != null) {
+                projectAround(Board.selectedTile, Board.previewTile.type.m, "highlight movement");
+                projectAround(Board.selectedTile, 4, "highlight damage");
+            }
+            projectAround(Board.previewTile, 4, "highlight attack");
+            projectAround(Board.previewTile, 4, "damage, icons");
+        } else {
+            if (Board.selectedTile != null) {
+                projectAround(Board.selectedTile, Board.selectedTile.type.m, "highlight movement");
+                projectAround(Board.selectedTile, 4, "damage, icons");
+            }
         }
 
         //debug text
@@ -147,6 +176,19 @@ var Board = {
                     Board.overlayElements.push(txt);
                 }
             }
+        }
+
+        //control hover/select overlay
+        if (Board.hoverTile != null) {
+            Board.hoverOutline.x = Board.hoverTile.x;
+            Board.hoverOutline.y = Board.hoverTile.y;
+            Board.overlayElements.push(Board.hoverOutline);
+            //projectAround(Board.hoverTile, 4, "damage");
+        }
+        if (Board.selectedTile != null) {
+            Board.selectOutline.x = Board.selectedTile.x;
+            Board.selectOutline.y = Board.selectedTile.y;
+            Board.overlayElements.push(Board.selectOutline);
         }
 
         //add all
@@ -169,6 +211,7 @@ var Tile = {
     //the tile list with all stats
     NONE: {img: "hex_null.png", team: "none", s: 0, m: 0, ds: 0, dl: 0},
     NEUTRAL: {img: "hex.png", team: "none", s: 0, m: 0, ds: 0, dl: 0},
+    DEATH: {img: "hex_death.png", team: "none", s: 0, m: 0, ds: 0, dl: 0},
     BLUE: {img: "hex_blue.png", team: "none", s: 0, m: 0, ds: 0, dl: 0},
     RED: {img: "hex_red.png", team: "none", s: 0, m: 0, ds: 0, dl: 0},
     GREEN: {img: "hex_green.png", team: "none", s: 0, m: 0, ds: 0, dl: 0},
@@ -234,20 +277,22 @@ var Tile = {
                     Board.moveShip(Board.selectedTile.i, Board.selectedTile.j, hex.i, hex.j, true);
                     Board.previewTile = Board.shipTiles[hex.i][hex.j];
                 } else {
+                    if (Board.selectedTile.i == hex.i && Board.selectedTile.j == hex.j) return;
                     //cancel move
                     var shipType = Board.previewTile.type;
                     Board.update(Board.previewTile.i, Board.previewTile.j, Tile.NONE, 'ship');
                     Board.previewTile = null;
+
                     //make new move
                     Board.update(Board.selectedTile.i, Board.selectedTile.j, shipType, 'ship');
                     Board.moveShip(Board.selectedTile.i, Board.selectedTile.j, hex.i, hex.j, true);
                     Board.previewTile = Board.shipTiles[hex.i][hex.j];
                 }
             }
-
             if (layer == 'ship') onClickShip();
             if (layer == 'board') onClickBoard();
             Board.refreshOverlays();
+            
         });
         return hex;
     },

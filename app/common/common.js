@@ -20,18 +20,6 @@ function contains(ti, tj, array) {
     return false;
 }
 
-var damageAt = function(i, j) {
-    var r_dmg = 0, b_dmg = 0;
-    var adj = Common.getAdjacent(i, j, false, 4);
-    for (var c = 0; c < adj.length; c++) {
-        if (adj[c] == null) continue;
-        var type = Board.shipTiles[adj[c].i][adj[c].j].type;
-        if (type.team == "r") r_dmg += type.ds;
-        if (type.team == "b") b_dmg += type.ds;
-    }
-    return {r: r_dmg, b: b_dmg};
-}
-
 var getAdjacent = function(i, j, include_origin, radius) {
 
     var adj = include_origin ? [{i: i, j: j}] : [];
