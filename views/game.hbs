@@ -40,12 +40,18 @@
         console.log("Connected to socket server as "+message+"!");
         io.emit("board request", gameID);
     });
+
+    io.on("disconnect", function(message) {
+        console.log("Disconnected from server :(");
+        showMessage
+        ("chat", {sender: "Server", color: "gray", contents: "You have disconnected. Refresh the page."});
+    });
     
     io.on("board", function(tiles) {
         console.log("Recieved board data from server!");
         for (var t = 0; t < tiles.length; t++) {
             console.log(tiles[t].name);
-            Board.update(tiles[t].x, tiles[t].y, Tile[tiles[t].name]);
+            Board.update(tiles[t].x, tiles[t].y, Tile[tiles[t].name], 'ship');
         }
     });
     
@@ -55,7 +61,7 @@
     });
 
     io.on("tile update", function(i, j, tileName) {
-        Board.update(i, j, Tile[tileName]);
+        Board.update(i, j, Tile[tileName], 'ship');
     });
     
 </script>

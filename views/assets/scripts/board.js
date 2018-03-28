@@ -2,15 +2,19 @@ var Board = {
     
     cols: 15,
     mid: 7,
-    tiles: [],
+
+    boardTiles: [],
+    shipTiles: [],
+    overlayTiles: [],
     textOverlays: [],
     selectOutline: new createjs.Bitmap("/images/tiles/outline_selected.png"),
     hoverOutline: new createjs.Bitmap("/images/tiles/outline_hover.png"),
     greenOutline: new createjs.Bitmap("/images/tiles/outline_green.png"),
-    whiteOutline: new createjs.Bitmap("/images/tiles/outline_hover.png"),
     redOutline: new createjs.Bitmap("/images/tiles/outline_red.png"),
     selectedTile: null,
-    hoveredTile: null,
+    previewTile: null,
+
+    debug: false,
 
     team: "none",
 
@@ -18,119 +22,132 @@ var Board = {
         var cols = 15;
         var rows = 8;
         for (i = 0; i < cols; i++) {
-            Board.tiles[i] = [];
+            Board.shipTiles[i] = [];
+            Board.boardTiles[i] = [];
+            Board.overlayTiles[i] = [];
             for (j = 0; j < rows; j++) {
-                var hex = Tile.create(i, j, Tile.NEUTRAL);
-                var dist = Math.abs(((cols-1)/2) - i);
-                var target_y = (j * 56) + (dist * (56/2));
-                Board.tiles[i].push(hex);
-                hex.x = i * 50;
-                hex.y = target_y;
-                hex.i = i;
-                hex.j = j;
-                stage.addChild(hex);
+                var neutral = Tile.create(i, j, Tile.NEUTRAL, 'board');
+                var none = Tile.create(i, j, Tile.NONE, 'ship');
+                var none2 = Tile.create(i, j, Tile.NONE, 'overlay');
+                Board.boardTiles[i].push(neutral);
+                Board.shipTiles[i].push(none);
+                Board.overlayTiles[i].push(none2);
+                stage.addChild(neutral);
             }
             rows += i >= ((cols-1)/2) ? -1 : 1;
         }
         createjs.Ticker.setFPS(60);
         createjs.Ticker.addEventListener("tick", stage);
         stage.update();
-        this.refreshOverlays(0, 0);
+        this.refreshOverlays();
     },
     
     performLoadAnimation: function() {
         //fall animation on board creation
-        for (i = 0; i < Board.tiles.length; i++) {
-            for (j = 0; j < Board.tiles[i].length; j++) {
-                var hex = Board.tiles[i][j];
+        for (i = 0; i < Board.shipTiles.length; i++) {
+            for (j = 0; j < Board.shipTiles[i].length; j++) {
+                var hex = Board.shipTiles[i][j];
                 createjs.Tween.get(hex, { loop: false })
                     .to({ alpha: 0}, 0, createjs.Ease.getPowInOut(2))
                     .to({ alpha: 1}, 0, createjs.Ease.getPowInOut(2));
             }
         }
     },
-    
-    update: function(i, j, type) {
-        var hex = Board.tiles[i][j];
-        Board.tiles[i][j] = Tile.create(i, j, type);
-        Board.tiles[i][j].x = hex.x;
-        Board.tiles[i][j].y = hex.y;
-        Board.tiles[i][j].i = hex.i;
-        Board.tiles[i][j].j = hex.j;
-        Board.tiles[i][j].target_y = hex.target_y;
-        createjs.Tween.get(hex, { loop: false })
-            .to({ alpha: 0 }, 200, createjs.Ease.getPowInOut(2))
-            .call(function() { 
-                stage.removeChild(hex);
+
+    moveShip(i, j, i2, j2, preview) {
+        console.log("Moving ship from "+i+", "+j+" to "+i2+", "+j2+(preview ? " [PREVIEW]" : ""));
+        var ship = Board.shipTiles[i][j];
+        if (preview) {
+            Board.update(i, j, Tile.NONE, 'ship');
+            Board.update(i2, j2, ship.type, 'ship');
+            createjs.Tween.get(Board.shipTiles[i2][j2], { override: true, loop: true })
+                .to({ alpha: .25 }, 500, createjs.Ease.getPowInOut(4))
+                .to({ alpha: 1 }, 500, createjs.Ease.getPowInOut(2));
+            createjs.Tween.get(Board.shipTiles[i][j], { override: true, loop: false })
+                .to({ alpha: 0 }, 200, createjs.Ease.getPowInOut(4));
+        } else {
+            io.emit("move request", {
+                pos1: {i: i, j: j}, 
+                pos2: {i: i2, j: j2}
             });
-        stage.addChild(Board.tiles[i][j]);
-        createjs.Tween.get(Board.tiles[i][j], { loop: false })
+        }
+    },
+    
+    update: function(i, j, type, layer) {
+        var grid = layer == 'ship' 
+            ? Board.shipTiles : (layer == 'board' ? Board.boardTiles : Board.overlayTiles);
+        var old_hex = grid[i][j];
+        grid[i][j] = Tile.create(i, j, type, layer);
+        grid[i][j].x = old_hex.x;
+        grid[i][j].y = old_hex.y;
+        grid[i][j].i = old_hex.i;
+        grid[i][j].j = old_hex.j;
+        if (old_hex == Board.previewTile) Board.previewTile = grid[i][j];
+        if (old_hex == Board.selectedTile) Board.selectedTile = grid[i][j];
+        if (old_hex == Board.hoverTile) Board.hoverTile = grid[i][j];
+        createjs.Tween.get(old_hex, { loop: false })
+            .to({ alpha: 0 }, 400, createjs.Ease.getPowInOut(2))
+            .call(function() { 
+                stage.removeChild(old_hex);
+            });
+        createjs.Tween.get(grid[i][j], { loop: false })
                 .to({ alpha: 0 }, 0, createjs.Ease.getPowInOut(2))
-                .to({ alpha: 1 }, 200, createjs.Ease.getPowInOut(2));
+                .to({ alpha: 1 }, 400, createjs.Ease.getPowInOut(2));
+        stage.addChild(grid[i][j]);
+        Board.refreshOverlays();
     },
     
     valueAt: function(i, j) {
-        return Board.tiles[i][j].value;
+        return Board.shipTiles[i][j].value;
     },
     
     tileType: function(i, j) {
-        return Board.tiles[i][j].type;
+        return Board.shipTiles[i][j].type;
+    },
+
+    toOSC: function(i, j) {
+        var dist = Math.abs(((Board.cols-1)/2) - i);
+        return {x: i * 50, y: (j * 56) + (dist * (56/2))};
     },
     
-    damageAt: function(i, j) {
-        var r_dmg = 0, b_dmg = 0;
-        var adj = Common.getAdjacent(i, j, false, 4);
-        for (var c = 0; c < adj.length; c++) {
-            if (adj[c] == null) continue;
-            var type = Board.tiles[adj[c].i][adj[c].j].type;
-            if (type.team == "r") r_dmg += type.ds;
-            if (type.team == "b") b_dmg += type.ds;
-        }
-        return {r: r_dmg, b: b_dmg};
-    },
-    
-    refreshOverlays: function(i, j) {
+    refreshOverlays: function() {
+
         stage.removeChild(Board.hoverOutline);
         stage.removeChild(Board.selectOutline);
-        //determine the color of the hover outline
-
-        Board.hoverOutline.x = Board.tiles[i][j].x;
-        Board.hoverOutline.y = Board.tiles[i][j].y;
+        
+        //control hover/select overlay
+        if (Board.hoverTile != null) {
+            Board.hoverOutline.x = Board.hoverTile.x;
+            Board.hoverOutline.y = Board.hoverTile.y;
+            stage.addChild(Board.hoverOutline);
+        }
         if (Board.selectedTile != null) {
             Board.selectOutline.x = Board.selectedTile.x;
             Board.selectOutline.y = Board.selectedTile.y;
             stage.addChild(Board.selectOutline);
         }
-        stage.addChild(Board.hoverOutline);
-        var l = Board.textOverlays.length;
-        for (var c = 0; c < l; c++) { stage.removeChild(Board.textOverlays.pop()); }
-        var adj = Common.getAdjacent(i, j, true, 3);
-        
-        for (var c = 0; c < adj.length; c++) {
-            //create text overlay
-            if (adj[c] == null) continue;
-            var hex = Board.tiles[adj[c].i][adj[c].j]; if (hex == null) continue;
-            var dmg = Board.damageAt(hex.i, hex.j).b;
-            var dist = Common.distance(i, j, hex.i, hex.j);
-            var txt = new createjs.Text(dmg, "20px Verdana", "#ffffff");
-            txt.x = hex.x + 25;
-            txt.y = hex.y + 20;
-            stage.addChild(txt);
-            Board.textOverlays.push(txt);
-        }
-
-        for (var c = 0; c < Board.cols; c++) {
-            for (var r = 0; r < Board.tiles[c].length; r++) {
-                var hex = Board.tiles[c][r]; if (hex == null) continue;
-                var txt = new createjs.Text(hex.i+", "+hex.j, "10px Verdana", "#ffffff");
-                txt.x = hex.x + 10;
-                txt.y = hex.y + 10;
-                stage.addChild(txt);
-                Board.textOverlays.push(txt);
+        //debug text
+        if (Board.debug) {
+            var l = Board.textOverlays.length;
+            for (var c = 0; c < l; c++) { stage.removeChild(Board.textOverlays.pop()); }
+            for (var c = 0; c < Board.cols; c++) {
+                for (var r = 0; r < Board.shipTiles[c].length; r++) {
+                    var hex = Board.shipTiles[c][r]; if (hex == null) continue;
+                    var txt = new createjs.Text(hex.i+", "+hex.j, "10px Verdana", "#ffffff");
+                    txt.x = hex.x + 10;
+                    txt.y = hex.y + 10;
+                    stage.addChild(txt);
+                    Board.textOverlays.push(txt);
+                }
             }
         }
-        
+        //refresh the stage
         stage.update();
+    },
+
+    toggleDebug: function() {
+        Board.debug = !Board.debug;
+        Board.refreshOverlays();
     }
     
 };
@@ -138,53 +155,86 @@ var Board = {
 var Tile = {
     
     //the tile list with all stats
-    NEUTRAL: {img: "hex.png", team: "n", s: 0, m: 0, ds: 0, dl: 0},
-    BLUE: {img: "hex_blue.png", team: "n", s: 0, m: 0, ds: 0, dl: 0},
-    RED: {img: "hex_red.png", team: "n", s: 0, m: 0, ds: 0, dl: 0},
-    GREEN: {img: "hex_green.png", team: "n", s: 0, m: 0, ds: 0, dl: 0},
-    PURPLE: {img: "hex_purple.png", team: "n", s: 0, m: 0, ds: 0, dl: 0},
-    BLUE_BATTLESHIP: {img: "ship_blue_battleship.png", team: "b", s: 40, m: 3, ds: 20, dl: 8},
-    BLUE_BOMBER: {img: "ship_blue_bomber.png", team: "b", s: 20, m: 4, ds: 2, dl: 8},
-    BLUE_CARRIER: {img: "ship_blue_carrier.png", team: "b", s: 36, m: 2, ds: 16, dl: 12},
-    BLUE_CRUISER: {img: "ship_blue_cruiser.png", team: "b", s: 30, m: 4, ds: 8, dl: 8},
-    BLUE_DESTROYER: {img: "ship_blue_destroyer.png", team: "b", s: 26, m: 4, ds: 12, dl: 4},
-    BLUE_ESCORT: {img: "ship_blue_escort.png", team: "b", s: 8, m: 6, ds: 2, dl: 2},
-    BLUE_FLAGSHIP: {img: "ship_blue_flagship.png", team: "b", s: 40, m: 2, ds: 24, dl: 12},
-    BLUE_GUNSHIP: {img: "ship_blue_gunship.png", team: "b", s: 16, m: 5, ds: 6, dl: 0},
-    BLUE_MARAUDER: {img: "ship_blue_marauder.png", team: "b", s: 12, m: 5, ds: 4, dl: 2},
-    RED_BATTLESHIP: {img: "ship_red_battleship.png", team: "r", s: 40, m: 3, ds: 20, dl: 8},
-    RED_BOMBER: {img: "ship_red_bomber.png", team: "r", s: 20, m: 4, ds: 2, dl: 8},
-    RED_CARRIER: {img: "ship_red_carrier.png", team: "r", s: 36, m: 2, ds: 16, dl: 12},
-    RED_CRUISER: {img: "ship_red_cruiser.png", team: "r", s: 30, m: 4, ds: 8, dl: 8},
+    NONE: {img: "hex_null.png", team: "none", s: 0, m: 0, ds: 0, dl: 0},
+    NEUTRAL: {img: "hex.png", team: "none", s: 0, m: 0, ds: 0, dl: 0},
+    BLUE: {img: "hex_blue.png", team: "none", s: 0, m: 0, ds: 0, dl: 0},
+    RED: {img: "hex_red.png", team: "none", s: 0, m: 0, ds: 0, dl: 0},
+    GREEN: {img: "hex_green.png", team: "none", s: 0, m: 0, ds: 0, dl: 0},
+    PURPLE: {img: "hex_purple.png", team: "none", s: 0, m: 0, ds: 0, dl: 0},
+    BLUE_BATTLESHIP: {img: "ship_blue_battleship.png", team: "blue", s: 40, m: 3, ds: 20, dl: 8},
+    BLUE_BOMBER: {img: "ship_blue_bomber.png", team: "blue", s: 20, m: 4, ds: 2, dl: 8},
+    BLUE_CARRIER: {img: "ship_blue_carrier.png", team: "blue", s: 36, m: 2, ds: 16, dl: 12},
+    BLUE_CRUISER: {img: "ship_blue_cruiser.png", team: "blue", s: 30, m: 4, ds: 8, dl: 8},
+    BLUE_DESTROYER: {img: "ship_blue_destroyer.png", team: "blue", s: 26, m: 4, ds: 12, dl: 4},
+    BLUE_ESCORT: {img: "ship_blue_escort.png", team: "blue", s: 8, m: 6, ds: 2, dl: 2},
+    BLUE_FLAGSHIP: {img: "ship_blue_flagship.png", team: "blue", s: 40, m: 2, ds: 24, dl: 12},
+    BLUE_GUNSHIP: {img: "ship_blue_gunship.png", team: "blue", s: 16, m: 5, ds: 6, dl: 0},
+    BLUE_MARAUDER: {img: "ship_blue_marauder.png", team: "blue", s: 12, m: 5, ds: 4, dl: 2},
+    RED_BATTLESHIP: {img: "ship_red_battleship.png", team: "red", s: 40, m: 3, ds: 20, dl: 8},
+    RED_BOMBER: {img: "ship_red_bomber.png", team: "red", s: 20, m: 4, ds: 2, dl: 8},
+    RED_CARRIER: {img: "ship_red_carrier.png", team: "red", s: 36, m: 2, ds: 16, dl: 12},
+    RED_CRUISER: {img: "ship_red_cruiser.png", team: "red", s: 30, m: 4, ds: 8, dl: 8},
     RED_DESTROYER: {img: "ship_red_destroyer.png", s: 26, m: 4, ds: 12, dl: 4},
-    RED_ESCORT: {img: "ship_red_escort.png", team: "r", s: 8, m: 6, ds: 2, dl: 2},
-    RED_FLAGSHIP: {img: "ship_red_flagship.png", team: "r", s: 40, m: 2, ds: 24, dl: 12},
-    RED_GUNSHIP: {img: "ship_red_gunship.png", team: "r", s: 16, m: 5, ds: 6, dl: 0},
-    RED_MARAUDER: {img: "ship_red_marauder.png", team: "r", s: 12, m: 5, ds: 4, dl: 2},
+    RED_ESCORT: {img: "ship_red_escort.png", team: "red", s: 8, m: 6, ds: 2, dl: 2},
+    RED_FLAGSHIP: {img: "ship_red_flagship.png", team: "red", s: 40, m: 2, ds: 24, dl: 12},
+    RED_GUNSHIP: {img: "ship_red_gunship.png", team: "red", s: 16, m: 5, ds: 6, dl: 0},
+    RED_MARAUDER: {img: "ship_red_marauder.png", team: "red", s: 12, m: 5, ds: 4, dl: 2},
     
     //create a new tile (instance of createjs.Bitmap, with custom props)
-    create: function(i, j, tile_type) {
+    create: function(i, j, tile_type, layer) {
+        //console.log("Creating tile: "+i+", "+j+", "+[tile_type]+", "+layer);
         var hex = new createjs.Bitmap("/images/tiles/"+tile_type.img);
         hex.type = tile_type;
         hex.value = -1;
         hex.i = i; hex.j = j;
+        hex.x = Board.toOSC(i, j).x;
+        hex.y = Board.toOSC(i, j).y;
         hex.name = tile_type.img;
+
         //define the interactive events
-        hex.addEventListener("mouseover", function(evt) {
-            Board.refreshOverlays(evt.target.i, evt.target.j);
+        hex.on("mouseover", function(evt) {
+            Board.hoverTile = hex;
+            Board.refreshOverlays();
         });
         hex.addEventListener("click", function(evt) {
-            if (Board.selectedTile != null) {
-                io.emit("move request", {
-                    pos1: {i: Board.selectedTile.i, j: Board.selectedTile.j}, 
-                    pos2: {i: hex.i, j: hex.j}
-                });
-                Board.selectedTile = null;
-            } else {
+
+            function onClickShip() {
+                if (hex == Board.previewTile) {
+                    //commit move
+                    Board.moveShip(Board.selectedTile.i, Board.selectedTile.j, hex.i, hex.j, false);
+                    Board.previewTile = null;
+                } else {
+                    if (Board.previewTile != null) {
+                        //cancel move
+                        var shipType = Board.previewTile.type;
+                        Board.update(Board.previewTile.i, Board.previewTile.j, Tile.NONE, 'ship');
+                        Board.update(Board.selectedTile.i, Board.selectedTile.j, shipType, 'ship');
+                        Board.previewTile = null;
+                    }
+                }
                 Board.selectedTile = hex;
             }
-            
-            Board.refreshOverlays(evt.target.i, evt.target.j);
+
+            function onClickBoard() {
+                if (Board.previewTile == null) {
+                    //make move
+                    Board.moveShip(Board.selectedTile.i, Board.selectedTile.j, hex.i, hex.j, true);
+                    Board.previewTile = Board.shipTiles[hex.i][hex.j];
+                } else {
+                    //cancel move
+                    var shipType = Board.previewTile.type;
+                    Board.update(Board.previewTile.i, Board.previewTile.j, Tile.NONE, 'ship');
+                    Board.previewTile = null;
+                    //make new move
+                    Board.update(Board.selectedTile.i, Board.selectedTile.j, shipType, 'ship');
+                    Board.moveShip(Board.selectedTile.i, Board.selectedTile.j, hex.i, hex.j, true);
+                    Board.previewTile = Board.shipTiles[hex.i][hex.j];
+                }
+            }
+
+            if (layer == 'ship') onClickShip();
+            if (layer == 'board') onClickBoard();
+            Board.refreshOverlays();
         });
         return hex;
     },

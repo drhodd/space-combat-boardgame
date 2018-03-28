@@ -87,7 +87,7 @@ function createNamespace(gameID) {
                 board.moveTile(move.pos1.i, move.pos1.j, move.pos2.i, move.pos2.j, gameID, function(err) {
                     if (err) { console.log("Error moving tile: "+err); return; }
                     console.log("Moving tile!");
-                    gamespace.emit("tile update", move.pos1.i, move.pos1.j, "NEUTRAL");
+                    gamespace.emit("tile update", move.pos1.i, move.pos1.j, "NONE");
                     gamespace.emit("tile update", move.pos2.i, move.pos2.j, data.name);
                 });
             });

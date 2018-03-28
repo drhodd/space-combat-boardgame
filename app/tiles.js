@@ -1,4 +1,5 @@
 //tile definitions and statistics
+module.exports.NONE = {s: 0, m: 0, ds: 0, dl: 0, team: 'none'};
 module.exports.NEUTRAL = {s: 0, m: 0, ds: 0, dl: 0, team: 'none'};
 module.exports.BLUE = {s: 0, m: 0, ds: 0, dl: 0, team: 'none'};
 module.exports.RED = {s: 0, m: 0, ds: 0, dl: 0, team: 'none'};
