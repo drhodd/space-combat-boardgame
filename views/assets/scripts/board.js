@@ -58,9 +58,7 @@ var Board = {
             Board.update(i2, j2, ship.type, 'ship');
             createjs.Tween.get(Board.shipTiles[i2][j2], { override: true, loop: true })
                 .to({ alpha: .25 }, 500, createjs.Ease.getPowInOut(2))
-                .to({ alpha: 1 }, 500, createjs.Ease.getPowInOut(2));
-            createjs.Tween.get(Board.shipTiles[i][j], { override: true, loop: false })
-                .to({ alpha: 0 }, 200, createjs.Ease.getPowInOut(4));
+                .to({ alpha: 1 }, 500, createjs.Ease.getPowInOut(3));
         } else {
             io.emit("move request", {
                 pos1: {i: i, j: j}, 
@@ -81,14 +79,7 @@ var Board = {
         if (old_hex == Board.previewTile) Board.previewTile = grid[i][j];
         if (old_hex == Board.selectedTile) Board.selectedTile = grid[i][j];
         if (old_hex == Board.hoverTile) Board.hoverTile = grid[i][j];
-        createjs.Tween.get(old_hex, { loop: false })
-            .to({ alpha: 0 }, 400, createjs.Ease.getPowInOut(2))
-            .call(function() { 
-                stage.removeChild(old_hex);
-            });
-        createjs.Tween.get(grid[i][j], { loop: false })
-                .to({ alpha: 0 }, 0, createjs.Ease.getPowInOut(2))
-                .to({ alpha: 1 }, 400, createjs.Ease.getPowInOut(2));
+        stage.removeChild(old_hex);
         stage.addChild(grid[i][j]);
         Board.refreshOverlays(layer == 'ship');
     },
@@ -147,13 +138,15 @@ var Board = {
                     if (mode.includes("damage") && !icon_shown) {
                         var damages = Board.damageAt(element.i, element.j);
                         var hi_val = damages.red > damages.blue ? damages.red : damages.blue;
-                        var hi_color = damages.red > damages.blue ? "#d3343c" : "#3464d3";
-                        var text = new createjs.Text(hi_val+"", "28px Arial", hi_color);
-                        var osc = Board.toOSC(element.i, element.j);
-                        text.x = osc.x + 37.5 - (text.getMeasuredWidth() / 2); 
-                        text.y = osc.y + 37.5 - (text.getMeasuredHeight() / 2);
-                        text.projection = true;
-                        Board.overlayElements.push(text);
+                        if (hi_val > 0) {
+                            var hi_color = damages.red > damages.blue ? "#d3343c" : "#3464d3";
+                            var text = new createjs.Text(hi_val+"", "28px Arial", hi_color);
+                            var osc = Board.toOSC(element.i, element.j);
+                            text.x = osc.x + 37.5 - (text.getMeasuredWidth() / 2); 
+                            text.y = osc.y + 37.5 - (text.getMeasuredHeight() / 2);
+                            text.projection = true;
+                            Board.overlayElements.push(text);
+                        }
                     }
                 }
             });
@@ -163,14 +156,14 @@ var Board = {
         if (Board.previewTile != null) {
             if (Board.selectedTile != null) {
                 projectAround(Board.selectedTile, Board.previewTile.type.m, "highlight movement");
-                projectAround(Board.selectedTile, 4, "highlight damage");
+                projectAround(Board.selectedTile, Board.previewTile.type.m, "highlight damage");
             }
             projectAround(Board.previewTile, 4, "highlight attack");
             projectAround(Board.previewTile, 4, "damage, icons");
         } else {
             if (Board.selectedTile != null) {
                 projectAround(Board.selectedTile, Board.selectedTile.type.m, "highlight movement");
-                projectAround(Board.selectedTile, 4, "damage, icons");
+                projectAround(Board.selectedTile, Board.selectedTile.type.m, "damage, icons");
             }
         }
 
@@ -286,14 +279,14 @@ var Tile = {
                     Board.moveShip(Board.selectedTile.i, Board.selectedTile.j, hex.i, hex.j, true);
                     Board.previewTile = Board.shipTiles[hex.i][hex.j];
                 } else {
-                    if (Board.selectedTile.i == hex.i && Board.selectedTile.j == hex.j) return;
+                    //if (Board.selectedTile.i == hex.i && Board.selectedTile.j == hex.j) return;
                     //cancel move
                     var shipType = Board.previewTile.type;
                     Board.update(Board.previewTile.i, Board.previewTile.j, Tile.NONE, 'ship');
+                    Board.update(Board.selectedTile.i, Board.selectedTile.j, shipType, 'ship');
                     Board.previewTile = null;
 
                     //make new move
-                    Board.update(Board.selectedTile.i, Board.selectedTile.j, shipType, 'ship');
                     Board.moveShip(Board.selectedTile.i, Board.selectedTile.j, hex.i, hex.j, true);
                     Board.previewTile = Board.shipTiles[hex.i][hex.j];
                 }
