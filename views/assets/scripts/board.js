@@ -54,8 +54,8 @@ var Board = {
         console.log("Moving ship from "+i+", "+j+" to "+i2+", "+j2+(preview ? " [PREVIEW]" : ""));
         var ship = Board.shipTiles[i][j];
         if (preview) {
-            Board.update(i, j, Tile.NONE, 'ship');
-            Board.update(i2, j2, ship.type, 'ship');
+            Board.update(i, j, Tile.NONE, 'ship', "normal");
+            Board.update(i2, j2, ship.type, 'ship', "normal");
             createjs.Tween.get(Board.shipTiles[i2][j2], { override: true, loop: true })
                 .to({ alpha: .25 }, 500, createjs.Ease.getPowInOut(2))
                 .to({ alpha: 1 }, 500, createjs.Ease.getPowInOut(3));
@@ -67,7 +67,23 @@ var Board = {
         }
     },
     
-    update: function(i, j, type, layer) {
+    update: function(i, j, type, layer, updateType) {
+
+        if (updateType == "kill") {
+            //make sure the board recognizes that the ship has been deleted
+            if (Board.selectedTile != null) if (Board.selectedTile.i == i
+                && Board.selectedTile.j == j) Board.selectedTile = null;
+            var deathAnim = Tile.create(i, j, Tile.DEATH, 'overlay');
+            createjs.Tween.get(deathAnim, { loop: false })
+                    .to({ alpha: 0}, 0, createjs.Ease.getPowInOut(2))
+                    .to({ alpha: 1}, 500, createjs.Ease.getPowInOut(2))
+                    .to({ alpha: 0}, 500, createjs.Ease.getPowInOut(2))
+                    .call(function() {
+                        stage.removeChild(deathAnim);
+                    });
+            stage.addChild(deathAnim);
+        }
+
         console.log("Updating board: "+i+", "+j+", "+type+", "+layer);
         var grid = layer == 'ship' ? Board.shipTiles : Board.boardTiles;
         var old_hex = grid[i][j];
@@ -76,9 +92,6 @@ var Board = {
         grid[i][j].y = old_hex.y;
         grid[i][j].i = old_hex.i;
         grid[i][j].j = old_hex.j;
-        if (old_hex == Board.previewTile) Board.previewTile = grid[i][j];
-        if (old_hex == Board.selectedTile) Board.selectedTile = grid[i][j];
-        if (old_hex == Board.hoverTile) Board.hoverTile = grid[i][j];
         stage.removeChild(old_hex);
         stage.addChild(grid[i][j]);
         Board.refreshOverlays(layer == 'ship');
@@ -284,8 +297,8 @@ var Tile = {
 
             function cancelMove() {
                 var shipType = Board.previewTile.type;
-                Board.update(Board.previewTile.i, Board.previewTile.j, Tile.NONE, 'ship');
-                Board.update(Board.selectedTile.i, Board.selectedTile.j, shipType, 'ship');
+                Board.update(Board.previewTile.i, Board.previewTile.j, Tile.NONE, 'ship', "normal");
+                Board.update(Board.selectedTile.i, Board.selectedTile.j, shipType, 'ship', "normal");
                 Board.previewTile = null;
             }
 

@@ -66,13 +66,7 @@
 
     io.on("tile update", function(i, j, tileName, updateType) {
         console.log("Received tile update packet ("+updateType+") from server for tile.");
-        //TODO: MOVE THE UPDATE TYPE HANDLING INTO UPDATE FUNCTION ITSELF
-        if (updateType == "kill") {
-            //make sure the board recognizes that the ship has been deleted
-            if (Board.selectedTile != null) if (Board.selectedTile.i == i
-                && Board.selectedTile.j == j) Board.selectedTile = null;
-        }
-        Board.update(i, j, Tile[tileName], 'ship');
+        Board.update(i, j, Tile[tileName], 'ship', updateType);
     });
     
 </script>
