@@ -60,6 +60,7 @@ hr { border: 0; height: 0; border-top: 1px solid rgba(0, 0, 0, 0.1); border-bott
     width: 90%;
     margin-left: 25px;
     height: 500px;
+    box-shadow: 3px 3px 10px rgba(.5, .5, .5, .5);
 }
 
 .msg {

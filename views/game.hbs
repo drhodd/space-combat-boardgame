@@ -61,6 +61,10 @@
         console.log(message.sender+": "+message.contents);
     });
 
+    io.on("team change", function(teamName) {
+        Board.teamName = teamName;
+    });
+
     io.on("tile update", function(i, j, tileName) {
         Board.update(i, j, Tile[tileName], 'ship');
     });

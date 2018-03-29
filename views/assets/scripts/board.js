@@ -15,7 +15,7 @@ var Board = {
 
     debug: false,
 
-    team: "none",
+    teamName: "none",
 
     create: function() {
         var cols = 15;
@@ -95,7 +95,24 @@ var Board = {
             if (type.team == "red") r_dmg += dist <= 2 ? type.ds : type.dl;
             if (type.team == "blue") b_dmg += dist <= 2 ? type.ds : type.dl;
         }
-        return {red: r_dmg, blue: b_dmg};
+        return {red: r_dmg, blue: b_dmg, none: 0};
+    },
+
+    canMoveTo(i, j, i2, j2) {
+        var ship = Board.shipTiles[i][j];
+        var dmgAt = Board.damageAt(i2, j2);
+        var dmg = ship.type.team == "red" ? dmgAt.blue : dmgAt.red;
+        var dist = Common.distance(i, j, i2, j2);
+        var range = ship.type.m;
+        var shields = ship.type.s;
+
+        var fatal = shields <= dmg;
+        var outOfRange = dist > range;
+        var can = !fatal && !outOfRange;
+        console.log("canMoveTo "+i+", "+j+", "+i2+", "+j2+": "+can
+            +" (fatal: "+fatal+", outOfRange: "+outOfRange
+            +", dmg: "+dmgAt.red+", "+dmgAt.blue+", shield: "+shields+")");
+        return can;
     },
 
     toOSC: function(i, j) {
@@ -256,7 +273,22 @@ var Tile = {
         });
         hex.addEventListener("click", function(evt) {
 
+            function cancelMove() {
+                var shipType = Board.previewTile.type;
+                Board.update(Board.previewTile.i, Board.previewTile.j, Tile.NONE, 'ship');
+                Board.update(Board.selectedTile.i, Board.selectedTile.j, shipType, 'ship');
+                Board.previewTile = null;
+            }
+
             function onClickShip() {
+                if (hex.type.team != Board.teamName) {
+                    showMessage("chat", 
+                        {sender: "Client", color: "gray", contents: "This ship is not yours!"});
+                    return;
+                }
+                if (Board.selectedTile != null)
+                if (hex.i == Board.selectedTile.i
+                    && hex.j == Board.selectedTile.j) { Board.selectedTile = null; return; }
                 if (hex == Board.previewTile) {
                     //commit move
                     Board.moveShip(Board.selectedTile.i, Board.selectedTile.j, hex.i, hex.j, false);
@@ -264,10 +296,7 @@ var Tile = {
                 } else {
                     if (Board.previewTile != null) {
                         //cancel move
-                        var shipType = Board.previewTile.type;
-                        Board.update(Board.previewTile.i, Board.previewTile.j, Tile.NONE, 'ship');
-                        Board.update(Board.selectedTile.i, Board.selectedTile.j, shipType, 'ship');
-                        Board.previewTile = null;
+                        cancelMove();
                     }
                 }
                 Board.selectedTile = hex;
@@ -276,16 +305,18 @@ var Tile = {
             function onClickBoard() {
                 if (Board.previewTile == null) {
                     //make move
+                    if (!Board.canMoveTo(Board.selectedTile.i, Board.selectedTile.j, hex.i, hex.j)) {
+                        Board.selectedTile = null;
+                        return;
+                    } 
                     Board.moveShip(Board.selectedTile.i, Board.selectedTile.j, hex.i, hex.j, true);
                     Board.previewTile = Board.shipTiles[hex.i][hex.j];
                 } else {
-                    //if (Board.selectedTile.i == hex.i && Board.selectedTile.j == hex.j) return;
+                    if (Board.selectedTile.i == hex.i && Board.selectedTile.j == hex.j) return;
                     //cancel move
-                    var shipType = Board.previewTile.type;
-                    Board.update(Board.previewTile.i, Board.previewTile.j, Tile.NONE, 'ship');
-                    Board.update(Board.selectedTile.i, Board.selectedTile.j, shipType, 'ship');
-                    Board.previewTile = null;
-
+                    cancelMove();
+                    if (!Board.canMoveTo(Board.selectedTile.i, Board.selectedTile.j, hex.i, hex.j)) 
+                    return;
                     //make new move
                     Board.moveShip(Board.selectedTile.i, Board.selectedTile.j, hex.i, hex.j, true);
                     Board.previewTile = Board.shipTiles[hex.i][hex.j];
