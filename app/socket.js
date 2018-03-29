@@ -1,6 +1,8 @@
 var board = require('../app/board.js');
 var io; var namespaces = [];
 var database = require('../app/database.js');
+var Tile = require("../app/tiles.js");
+var Common = require("../app/common/common.js");
 
 function init(socketIO) {
     io = socketIO;
@@ -82,16 +84,43 @@ function createNamespace(gameID) {
             }
         });
 
-        socket.on("move request", function(move) {
-            console.log("Received move request from "+usernames.get(socket.id));
-            board.getTileData(move.pos1.i, move.pos1.j, gameID, function(data){
+        socket.on("move request", function(move, isRam) {
+            console.log("Received move request from "+usernames.get(socket.id)+" (ram: "+isRam+")");
+            board.getTileData(move.pos1.i, move.pos1.j, gameID, function(data) {
+                if (data == undefined) { console.log("Move failed! Source is undefined."); return; }
                 console.log("Source tile: "+data.name);
-                board.moveTile(move.pos1.i, move.pos1.j, move.pos2.i, move.pos2.j, gameID, function(err) {
-                    if (err) { console.log("Error moving tile: "+err); return; }
-                    console.log("Moving tile!");
-                    gamespace.emit("tile update", move.pos1.i, move.pos1.j, "NONE");
-                    gamespace.emit("tile update", move.pos2.i, move.pos2.j, data.name);
-                });
+                if (isRam) {
+                    //validate ram
+                    board.getTileData(move.pos2.i, move.pos2.j, gameID, function(data2) {
+                        var dist = Common.distance(move.pos1.i, move.pos1.j, move.pos2.i, move.pos2.j);
+                        var range = Tile[data.name].m; 
+                        var damage = Tile[data.name].s * 2, shield2 = Tile[data2.name].s;
+                        if (dist <= range) {
+                            console.log("Ramming is in range!");
+                            //remove ships from database
+                            board.killShip(move.pos1.i, move.pos1.j, gameID, function(err, results) {
+                                if (err) return;
+                                var successfulKill = shield2 <= damage;
+                                console.log("Checking for kill... (src: "+damage+", target: "+shield2+")");
+                                gamespace.emit("tile update", move.pos1.i, move.pos1.j, "NONE", "kill");
+                                if (successfulKill) {
+                                    console.log("Successful kill! (src: "+damage+", target: "+shield2+")");
+                                    board.killShip(move.pos2.i, move.pos2.j, gameID, function(err, results) {
+                                        if (err) return;
+                                        gamespace.emit("tile update", move.pos2.i, move.pos2.j, "NONE", "kill");
+                                    });
+                                }
+                            });
+                        }
+                    });
+                } else {
+                    board.moveShip(move.pos1.i, move.pos1.j, move.pos2.i, move.pos2.j, gameID, function(err) {
+                        if (err) { console.log("Error moving tile: "+err); return; }
+                        console.log("Moving tile!");
+                        gamespace.emit("tile update", move.pos1.i, move.pos1.j, "NONE", "move");
+                        gamespace.emit("tile update", move.pos2.i, move.pos2.j, data.name, "move");
+                    });
+                }
             });
         });
         

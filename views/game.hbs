@@ -10,7 +10,7 @@
     <div class = "left">
         <div class = "chat center container">
             <div class = "top" style = "margin-left: 35px; top: 490px;">
-                <input id = "chatbox" maxlength = "32" placeholder = "Type something..." class = "chatbox" type = "text"></input>
+                <input id = "chatbox" placeholder = "Type something..." class = "chatbox" type = "text"></input>
             </div>
             <!--GAME CHAT-->
             <div id = "chat"></div>
@@ -33,7 +33,6 @@
 <script src="/socket.io/socket.io.js"></script>
 <script>
     var gameID = "{{gameID}}";
-    var teamName = "{{teamName}}";
     var io = io("/"+gameID);
     
     io.on("connect", function(message) {
@@ -65,7 +64,13 @@
         Board.teamName = teamName;
     });
 
-    io.on("tile update", function(i, j, tileName) {
+    io.on("tile update", function(i, j, tileName, updateType) {
+        //TODO: MOVE THE UPDATE TYPE HANDLING INTO UPDATE FUNCTION ITSELF
+        if (updateType == "kill") {
+            //make sure the board recognizes that the ship has been deleted
+            if (Board.selectedTile != null) if (Board.selectedTile.i == i
+                && Board.selectedTile.j == j) Board.selectedTile = null;
+        }
         Board.update(i, j, Tile[tileName], 'ship');
     });
     
@@ -87,8 +92,8 @@
         var sender = message.sender;
         var chat_dom = document.getElementById("chat");
         var chats = chat_dom.innerHTML.split("<br>");
-        if (chats.length > 23) chat_dom.innerHTML = chat_dom.innerHTML.replace(chats[0]+"<br>", "");
-        chat_dom.innerHTML += "<b style = '"+('color: '+message.color)+"'>" + sender + "</b>: " + msg + "<br>";
+        chat_dom.innerHTML = "<b style = '"+('color: '+message.color)+"'>" + sender + "</b>: " + msg + "<br>" 
+            + chat_dom.innerHTML;
     }
 
 </script>

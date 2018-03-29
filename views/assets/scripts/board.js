@@ -63,7 +63,7 @@ var Board = {
             io.emit("move request", {
                 pos1: {i: i, j: j}, 
                 pos2: {i: i2, j: j2}
-            });
+            }, false); //false meaning not a ram
         }
     },
     
@@ -202,6 +202,14 @@ var Board = {
             Board.hoverOutline.x = Board.hoverTile.x;
             Board.hoverOutline.y = Board.hoverTile.y;
             Board.overlayElements.push(Board.hoverOutline);
+            if (Board.selectedTile != null  && Board.previewTile == null) {
+                var hoverteam = Board.hoverTile.type.team;
+                if (Board.teamName != hoverteam && hoverteam != "none") {
+                    Board.redOutline.x = Board.hoverTile.x;
+                    Board.redOutline.y = Board.hoverTile.y;
+                    Board.overlayElements.push(Board.redOutline);
+                }
+            }
             //projectAround(Board.hoverTile, 4, "damage");
         }
         if (Board.selectedTile != null) {
@@ -248,7 +256,7 @@ var Tile = {
     RED_BOMBER: {img: "ship_red_bomber.png", team: "red", s: 20, m: 4, ds: 2, dl: 8},
     RED_CARRIER: {img: "ship_red_carrier.png", team: "red", s: 36, m: 2, ds: 16, dl: 12},
     RED_CRUISER: {img: "ship_red_cruiser.png", team: "red", s: 30, m: 4, ds: 8, dl: 8},
-    RED_DESTROYER: {img: "ship_red_destroyer.png", s: 26, m: 4, ds: 12, dl: 4},
+    RED_DESTROYER: {img: "ship_red_destroyer.png", team: "red", s: 26, m: 4, ds: 12, dl: 4},
     RED_ESCORT: {img: "ship_red_escort.png", team: "red", s: 8, m: 6, ds: 2, dl: 2},
     RED_FLAGSHIP: {img: "ship_red_flagship.png", team: "red", s: 40, m: 2, ds: 24, dl: 12},
     RED_GUNSHIP: {img: "ship_red_gunship.png", team: "red", s: 16, m: 5, ds: 6, dl: 0},
@@ -268,6 +276,7 @@ var Tile = {
         if (layer == 'overlay') return hex;
         //define the interactive events
         hex.on("mouseover", function(evt) {
+            if (layer == 'overlay') return;
             Board.hoverTile = hex;
             Board.refreshOverlays(false);
         });
@@ -282,8 +291,16 @@ var Tile = {
 
             function onClickShip() {
                 if (hex.type.team != Board.teamName) {
-                    showMessage("chat", 
-                        {sender: "Client", color: "gray", contents: "This ship is not yours!"});
+                    if (Board.selectedTile == null) {
+                        showMessage("chat", 
+                            {sender: "Client", color: "gray", contents: "This ship is not yours!"});
+                    } else {
+                        //send a ram packet
+                        io.emit("move request", {
+                            pos1: {i: Board.selectedTile.i, j: Board.selectedTile.j}, 
+                            pos2: {i: hex.i, j: hex.j}
+                        }, true); //isRam = true
+                    }
                     return;
                 }
                 if (Board.selectedTile != null)
@@ -291,6 +308,7 @@ var Tile = {
                     && hex.j == Board.selectedTile.j) { Board.selectedTile = null; return; }
                 if (hex == Board.previewTile) {
                     //commit move
+                    if (Board.selectedTile == null) return;
                     Board.moveShip(Board.selectedTile.i, Board.selectedTile.j, hex.i, hex.j, false);
                     Board.previewTile = null;
                 } else {
@@ -312,6 +330,7 @@ var Tile = {
                     Board.moveShip(Board.selectedTile.i, Board.selectedTile.j, hex.i, hex.j, true);
                     Board.previewTile = Board.shipTiles[hex.i][hex.j];
                 } else {
+                    if (Board.selectedTile == null) return;
                     if (Board.selectedTile.i == hex.i && Board.selectedTile.j == hex.j) return;
                     //cancel move
                     cancelMove();
@@ -322,6 +341,7 @@ var Tile = {
                     Board.previewTile = Board.shipTiles[hex.i][hex.j];
                 }
             }
+
             if (layer == 'ship') onClickShip();
             if (layer == 'board') onClickBoard();
             Board.refreshOverlays(true);

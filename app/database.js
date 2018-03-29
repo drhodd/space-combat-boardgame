@@ -99,8 +99,17 @@ function get(collectionName, query, callback) {
     });
 };
 
+function remove(collectionName, query, callback) {
+    var collection = database.collection(collectionName);
+    collection.deleteMany(query, function(err, result) {
+        if (err) { console.log(err.message); }
+        callback(err, result);
+    });
+};
+
 module.exports.connect = connect;
 module.exports.createGame = createGame;
 module.exports.insert = insert;
 module.exports.get = get;
 module.exports.update = update;
+module.exports.remove = remove;

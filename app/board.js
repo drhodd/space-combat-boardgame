@@ -11,8 +11,14 @@ function getTileData(i, j, gameID, callback) {
     });
 }
 
-function moveTile(i, j, new_i, new_j, gameID, callback) {
+function moveShip(i, j, new_i, new_j, gameID, callback) {
     database.update("tiles", {game: gameID, x: i, y: j}, {x: new_i, y: new_j}, function(err, result) {
+        callback(err);
+    });
+}
+
+function killShip(i, j, gameID, callback) {
+    database.remove("tiles", {game: gameID, x: i, y: j}, function(err, result) {
         callback(err);
     });
 }
@@ -20,4 +26,5 @@ function moveTile(i, j, new_i, new_j, gameID, callback) {
 module.exports.getTileData = getTileData;
 module.exports.cols = cols;
 module.exports.mid = mid;
-module.exports.moveTile = moveTile;
+module.exports.moveShip = moveShip;
+module.exports.killShip = killShip;
