@@ -16,6 +16,8 @@ var Board = {
     debug: false,
 
     teamName: "none",
+    movesLeft: 0,
+    isYourTurn: false,
 
     create: function() {
         var cols = 15;

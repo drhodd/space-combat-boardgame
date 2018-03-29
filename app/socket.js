@@ -86,13 +86,13 @@ function createNamespace(gameID) {
 
         socket.on("move request", function(move, isRam) {
             console.log("Received move request from "+usernames.get(socket.id)+" (ram: "+isRam+")");
+            var dist = Common.distance(move.pos1.i, move.pos1.j, move.pos2.i, move.pos2.j);
             board.getTileData(move.pos1.i, move.pos1.j, gameID, function(data) {
                 if (data == undefined) { console.log("Move failed! Source is undefined."); return; }
                 console.log("Source tile: "+data.name);
                 if (isRam) {
                     //validate ram
                     board.getTileData(move.pos2.i, move.pos2.j, gameID, function(data2) {
-                        var dist = Common.distance(move.pos1.i, move.pos1.j, move.pos2.i, move.pos2.j);
                         var range = Tile[data.name].m; 
                         var damage = Tile[data.name].s * 2, shield2 = Tile[data2.name].s;
                         if (dist <= range) {
@@ -111,6 +111,11 @@ function createNamespace(gameID) {
                                     });
                                 }
                             });
+                            //send new movesleft data to player
+                            board.applyMovesUsed(dist, gameID, function(movesLeft, currentTeam) {
+                                socket.emit("moves left", movesLeft);
+                                socket.emit("turn update", currentTeam);
+                            });
                         }
                     });
                 } else {
@@ -119,6 +124,10 @@ function createNamespace(gameID) {
                         console.log("Moving tile!");
                         gamespace.emit("tile update", move.pos1.i, move.pos1.j, "NONE", "move");
                         gamespace.emit("tile update", move.pos2.i, move.pos2.j, data.name, "move");
+                        board.applyMovesUsed(dist, gameID, function(movesLeft, currentTeam) {
+                            socket.emit("moves left", movesLeft);
+                            socket.emit("turn update", currentTeam);
+                        });
                         board.killVulnerableShips(gameID, function(i, j, name) {
                             gamespace.emit("tile update", i, j, "NONE", "kill");
                         });

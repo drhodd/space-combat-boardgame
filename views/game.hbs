@@ -68,6 +68,23 @@
         console.log("Received tile update packet ("+updateType+") from server for tile.");
         Board.update(i, j, Tile[tileName], 'ship', updateType);
     });
+
+    io.on("moves left", function(movesLeft) {
+        Board.movesLeft = movesLeft;
+        showMessage("chat", 
+            {sender: "Server", 
+            contents: "You have "+Board.movesLeft+" moves left.", 
+            color: "gray"});
+    });
+
+    io.on("turn update", function(teamID) {
+        var change = Board.teamName != teamID;
+        Board.isYourTurn = teamID == Board.teamName;
+        if (change) showMessage("chat",
+                        {sender: "Server", 
+                        contents: Board.isYourTurn ? "It's your turn!" : "It's "+teamID+"'s turn!", 
+                        color: "gray"});
+    });
     
 </script>
 

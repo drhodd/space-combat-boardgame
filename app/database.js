@@ -21,7 +21,7 @@ function createTables() {
 
 function createGame(callback) {
     var random_url = Math.random().toString(36).substring(8);
-    var game = {url: random_url, turn: "red"};
+    var game = {url: random_url, turn: "red", movesLeft: 16};
     var tile_entries = [
         {name: "RED_FLAGSHIP", x: 7, y: 0, game: random_url},
         {name: "RED_DESTROYER", x: 6, y: 0, game: random_url},
