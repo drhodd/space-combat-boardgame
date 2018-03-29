@@ -119,6 +119,9 @@ function createNamespace(gameID) {
                         console.log("Moving tile!");
                         gamespace.emit("tile update", move.pos1.i, move.pos1.j, "NONE", "move");
                         gamespace.emit("tile update", move.pos2.i, move.pos2.j, data.name, "move");
+                        board.killVulnerableShips(gameID, function(i, j, name) {
+                            gamespace.emit("tile update", i, j, "NONE", "kill");
+                        });
                     });
                 }
             });

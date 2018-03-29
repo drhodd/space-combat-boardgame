@@ -335,7 +335,7 @@ var Tile = {
                     //cancel move
                     cancelMove();
                     if (!Board.canMoveTo(Board.selectedTile.i, Board.selectedTile.j, hex.i, hex.j)) 
-                    return;
+                        return;
                     //make new move
                     Board.moveShip(Board.selectedTile.i, Board.selectedTile.j, hex.i, hex.j, true);
                     Board.previewTile = Board.shipTiles[hex.i][hex.j];
