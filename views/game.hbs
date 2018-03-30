@@ -75,7 +75,8 @@
         Board.update(i, j, Tile[tileName], 'ship', updateType);
     });
 
-    io.on("moves left", function(movesLeft) {
+    io.on("moves left", function(movesLeft, currentTeam) {
+        if (Board.teamName != currentTeam) return;
         Board.movesLeft = movesLeft;
         console.log("Moves left: "+movesLeft);
         showMessage("chat", 
@@ -87,12 +88,13 @@
 
     io.on("turn update", function(teamID) {
         console.log("Turn update: "+teamID);
-        var change = Board.teamName != teamID;
+        var change = Board.turn != teamID;
         Board.turn = teamID;
         if (change) showMessage("chat",
                         {sender: "Server", 
                         contents: "It's "+teamID+"'s turn!", 
                         color: "gray"});
+        Board.refreshOverlays(true);
     });
     
 </script>

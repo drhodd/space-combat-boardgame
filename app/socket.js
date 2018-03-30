@@ -45,7 +45,7 @@ function createNamespace(gameID) {
             board.applyMovesUsed(dist, gameID, function(movesLeft, currentTeam) {
                 console.log("Current move: "+currentTeam+", moves left: "+movesLeft);
                 var teamID = userteams.get(socket.id);
-                if (teamID == currentTeam) socket.emit("moves left", movesLeft);
+                gamespace.emit("moves left", movesLeft, currentTeam);
                 gamespace.emit("turn update", currentTeam);
             });
         }
