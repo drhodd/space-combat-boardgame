@@ -44,8 +44,10 @@ function moveShip(i, j, new_i, new_j, gameID, callback) {
     });
 }
 
-function killShip(i, j, gameID) {
-    database.remove("tiles", {game: gameID, x: i, y: j}, function(err, result) {});
+function killShip(i, j, gameID, callback) {
+    database.remove("tiles", {game: gameID, x: i, y: j}, function(err, result) {
+        callback(err, result);
+    });
 }
 
 function killVulnerableShips(gameID, perShipCallback, completionCallback) {
@@ -61,7 +63,7 @@ function killVulnerableShips(gameID, perShipCallback, completionCallback) {
             console.log("Kill ship "+results[s].name+": "+kill+" ("+tile.s+", "+dmg_val+")");
             if (kill) {
                 perShipCallback(results[s].x, results[s].y, results[s].name);
-                killShip(results[s].x, results[s].y, gameID);
+                killShip(results[s].x, results[s].y, gameID, function(err, result){});
                 //TODO: FINISH SERVER TRACKING SHIP COUNTS, FINISH TURN PROGRESSION
             }
         }
@@ -73,9 +75,9 @@ function damageAt(i, j, tileDocs) {
     var dmg = {red: 0, blue: 0};
     for (var s = 0; s < tileDocs.length; s++) {
         var ship = tileDocs[s];
-        if (ship.x == i && ship.y == j) continue;
         var dist = Common.distance(i, j, ship.x, ship.y);
         if (dist > 4) continue;
+        console.log("FOUND NEARBY SHIP: "+dist+", "+ship.name);
         if (Tile[ship.name].team == "red") dmg.red += dist <= 2 ? Tile[ship.name].ds : Tile[ship.name].dl;
         if (Tile[ship.name].team == "blue") dmg.blue += dist <= 2 ? Tile[ship.name].ds : Tile[ship.name].dl;
     }

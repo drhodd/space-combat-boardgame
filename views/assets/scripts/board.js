@@ -187,15 +187,17 @@ var Board = {
         //draw radius highlights around ships
         if (Board.previewTile != null) {
             if (Board.selectedTile != null) {
-                projectAround(Board.selectedTile, Board.previewTile.type.m, "highlight movement");
-                projectAround(Board.selectedTile, Board.previewTile.type.m, "highlight damage");
+                var min = Math.min(Board.previewTile.type.m, Board.movesLeft);
+                projectAround(Board.selectedTile, min, "highlight movement");
+                projectAround(Board.selectedTile, min, "highlight damage");
             }
             projectAround(Board.previewTile, 4, "highlight attack");
             projectAround(Board.previewTile, 4, "damage, icons");
         } else {
             if (Board.selectedTile != null) {
-                projectAround(Board.selectedTile, Board.selectedTile.type.m, "highlight movement");
-                projectAround(Board.selectedTile, Board.selectedTile.type.m, "damage, icons");
+                var min = Math.min(Board.selectedTile.type.m, Board.movesLeft);
+                projectAround(Board.selectedTile, min, "highlight movement");
+                projectAround(Board.selectedTile, min, "damage, icons");
             }
         }
 

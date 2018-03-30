@@ -65,7 +65,7 @@
     });
 
     io.on("tile update", function(i, j, tileName, updateType) {
-        console.log("Received tile update packet ("+updateType+") from server for tile.");
+        console.log("Received tile update packet ("+updateType+") from server: "+i+", "+j+", "+tileName);
         Board.update(i, j, Tile[tileName], 'ship', updateType);
     });
 
@@ -76,6 +76,7 @@
             {sender: "Server", 
             contents: "You have "+Board.movesLeft+" moves left.", 
             color: "gray"});
+        Board.refreshOverlays(true);
     });
 
     io.on("turn update", function(teamID) {
