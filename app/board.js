@@ -26,7 +26,7 @@ function applyMovesUsed(movesUsed, gameID, callback) {
             var newteam = game.turn;
             if (movesleft <= 0) {
                 newteam = newteam == "red" ? "blue" : "red";
-                movesleft = shipCounts[newteam];
+                movesleft = Math.min(shipCounts["red"], shipCounts["blue"]);
             }
             callback(movesleft, newteam);
             database.update("games", {url: gameID}, 

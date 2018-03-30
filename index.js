@@ -21,6 +21,7 @@ app.set('view engine', '.hbs');
 app.set('views', path.join(__dirname, 'views'));
 
 /*Set locations for getting static content*/
+app.use('/assets',express.static(path.join(__dirname, 'views/assets')));
 app.use('/images',express.static(path.join(__dirname, 'views/assets/images')));
 app.use('/css',express.static(path.join(__dirname, 'views/assets/stylesheets')));
 app.use('/scripts',express.static(path.join(__dirname, 'views/assets/scripts')));

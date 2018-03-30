@@ -18,6 +18,7 @@ var Board = {
     teamName: "none",
     movesLeft: 0,
     turn: "none",
+    turnID: "",
 
     create: function() {
         var cols = 15;
@@ -97,6 +98,9 @@ var Board = {
         stage.removeChild(old_hex);
         stage.addChild(grid[i][j]);
         Board.refreshOverlays(layer == 'ship');
+
+        if (updateType == "move") Board.shipTiles[i][j].lastTurn = Board.turnID;
+
     },
 
     damageAt: function(i, j) {
@@ -289,6 +293,7 @@ var Tile = {
         hex.x = Board.toOSC(i, j).x;
         hex.y = Board.toOSC(i, j).y;
         hex.name = tile_type.img;
+        hex.lastTurn = "";
 
         if (layer == 'overlay') return hex;
         //define the interactive events
@@ -307,6 +312,12 @@ var Tile = {
             }
 
             function onClickShip() {
+                if (hex.lastTurn == Board.turnID) {
+                    showMessage("chat", 
+                            {sender: "Client", color: "gray", 
+                            contents: "You've moved this ship already!"});
+                    return;
+                }
                 if (Board.turn != Board.teamName) {
                     showMessage("chat", 
                             {sender: "Client", color: "gray", 

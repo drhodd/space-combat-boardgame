@@ -1,0 +1,10 @@
+1.0.1-alpha: March 30, 2018
+
+* fixed broken turn progression
+* fixed fleet move count being different for both teams
+* fixed miscellaneous chat bugs
+* ships can now only move once per turn
+
+1.0.0-alpha: March 29, 2018
+
++ alpha release!

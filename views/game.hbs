@@ -17,6 +17,10 @@
         </div>
     </div>
     <div class = "top">
+        <a target = "_blank" href = "/assets/changelog.txt" 
+            style = "float: right; color: white; margin-right: 10px;">
+            game version: 1.0.1-alpha
+        </a>
     </div>
 </body>
 
@@ -90,10 +94,13 @@
         console.log("Turn update: "+teamID);
         var change = Board.turn != teamID;
         Board.turn = teamID;
-        if (change) showMessage("chat",
+        if (change) {
+            showMessage("chat",
                         {sender: "Server", 
                         contents: "It's "+teamID+"'s turn!", 
                         color: "gray"});
+            Board.turnID = Math.floor(Math.random()*100000)+"";
+        }
         Board.refreshOverlays(true);
     });
     
