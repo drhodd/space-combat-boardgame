@@ -36,8 +36,20 @@ function createNamespace(gameID) {
         userteams.set(socket.id, "none");
         gamespace.emit("chat", 
                 {sender: "Server", contents: usernames.get(socket.id)+" has connected.", color: "gray"});
+        //send turn data
+        applyMovesUsed(0);
         console.log(usernames.get(socket.id)+" has connected to "+gameID+" [ID: "+socket.id+"]");
         
+        function applyMovesUsed(dist) {
+            //send new movesleft data to player
+            board.applyMovesUsed(dist, gameID, function(movesLeft, currentTeam) {
+                console.log("Current move: "+currentTeam+", moves left: "+movesLeft);
+                var teamID = userteams.get(socket.id);
+                if (teamID == currentTeam) socket.emit("moves left", movesLeft);
+                gamespace.emit("turn update", currentTeam);
+            });
+        }
+
         socket.on('disconnect', function(){
             gamespace.emit("chat", 
                 {sender: "Server", contents: usernames.get(socket.id)+" has disconnected.", color: "gray"});
@@ -70,6 +82,7 @@ function createNamespace(gameID) {
                     console.log(m); 
                     gamespace.emit("chat", {sender: "Server", contents: m, color: "gray"});
                     gamespace.emit("team change", teamID);
+                    applyMovesUsed(0);
                 } else if (cmd[0] == "/info") {
                     var x = Number(cmd[1]), y = Number(cmd[2]);
                     board.isTileEmpty(x, y, gameID, function(result) {
@@ -93,6 +106,7 @@ function createNamespace(gameID) {
                 if (isRam) {
                     //validate ram
                     board.getTileData(move.pos2.i, move.pos2.j, gameID, function(data2) {
+                        if (Tile[data.name] == undefined) return;
                         var range = Tile[data.name].m; 
                         var damage = Tile[data.name].s * 2, shield2 = Tile[data2.name].s;
                         if (dist <= range) {
@@ -108,13 +122,11 @@ function createNamespace(gameID) {
                                     board.killShip(move.pos2.i, move.pos2.j, gameID, function(err, results) {
                                         if (err) return;
                                         gamespace.emit("tile update", move.pos2.i, move.pos2.j, "NONE", "kill");
+                                        applyMovesUsed(dist);
                                     });
+                                } else {
+                                    applyMovesUsed(dist);
                                 }
-                            });
-                            //send new movesleft data to player
-                            board.applyMovesUsed(dist, gameID, function(movesLeft, currentTeam) {
-                                socket.emit("moves left", movesLeft);
-                                socket.emit("turn update", currentTeam);
                             });
                         }
                     });
@@ -124,12 +136,10 @@ function createNamespace(gameID) {
                         console.log("Moving tile!");
                         gamespace.emit("tile update", move.pos1.i, move.pos1.j, "NONE", "move");
                         gamespace.emit("tile update", move.pos2.i, move.pos2.j, data.name, "move");
-                        board.applyMovesUsed(dist, gameID, function(movesLeft, currentTeam) {
-                            socket.emit("moves left", movesLeft);
-                            socket.emit("turn update", currentTeam);
-                        });
                         board.killVulnerableShips(gameID, function(i, j, name) {
                             gamespace.emit("tile update", i, j, "NONE", "kill");
+                        }, function() {
+                            applyMovesUsed(dist);
                         });
                     });
                 }

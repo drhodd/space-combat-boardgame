@@ -13,20 +13,27 @@ function getTileData(i, j, gameID, callback) {
 }
 
 function applyMovesUsed(movesUsed, gameID, callback) {
-    database.get("games", {url: gameID}, function(err, docs) {
+    var shipCounts = {red: 0, blue: 0, none: 0};
+    database.get("tiles", {game: gameID}, function(err, ships) {
         if (err) return;
-        if (docs.length == 0) return;
-        var game = docs[0];
-        var movesleft = game.movesLeft - movesUsed;
-        var newteam = game.turn;
-        if (movesleft <= 0) {
-            newteam = newteam == "red" ? "blue" : "red";
-            movesleft = 
-        }
-        callback(movesleft, newteam);
-        database.update("games", {url: gameID}, 
-            {movesLeft: movesleft, turn: newteam}, function(err, result) {
-                if (err) return;
+        console.log("Ship count: "+ships.length);
+        for (var s = 0; s < ships.length; s++) shipCounts[Tile[ships[s].name].team]++;
+        database.get("games", {url: gameID}, function(err, docs) {
+            if (err) return;
+            if (docs.length == 0) return;
+            var game = docs[0];
+            var movesleft = game.movesLeft - movesUsed;
+            var newteam = game.turn;
+            if (movesleft <= 0) {
+                newteam = newteam == "red" ? "blue" : "red";
+                movesleft = shipCounts[newteam];
+            }
+            callback(movesleft, newteam);
+            database.update("games", {url: gameID}, 
+                {movesLeft: movesleft, turn: newteam}, function(err, result) {
+                    if (err) return;
+                    console.log("Game turn state: "+movesleft+", "+newteam);
+            });
         });
     });
 }
@@ -37,13 +44,11 @@ function moveShip(i, j, new_i, new_j, gameID, callback) {
     });
 }
 
-function killShip(i, j, gameID, callback) {
-    database.remove("tiles", {game: gameID, x: i, y: j}, function(err, result) {
-        callback(err);
-    });
+function killShip(i, j, gameID) {
+    database.remove("tiles", {game: gameID, x: i, y: j}, function(err, result) {});
 }
 
-function killVulnerableShips(gameID, perShipCallback) {
+function killVulnerableShips(gameID, perShipCallback, completionCallback) {
     database.get("tiles", {game: gameID}, function(err, results) {
         if (err) { return; }
         if (results.length == 0) { return; }
@@ -58,8 +63,9 @@ function killVulnerableShips(gameID, perShipCallback) {
                 perShipCallback(results[s].x, results[s].y, results[s].name);
                 killShip(results[s].x, results[s].y, gameID);
                 //TODO: FINISH SERVER TRACKING SHIP COUNTS, FINISH TURN PROGRESSION
-            } 
+            }
         }
+        completionCallback();
     });
 }
 

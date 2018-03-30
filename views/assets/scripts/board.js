@@ -17,7 +17,7 @@ var Board = {
 
     teamName: "none",
     movesLeft: 0,
-    isYourTurn: false,
+    turn: "none",
 
     create: function() {
         var cols = 15;
@@ -120,12 +120,12 @@ var Board = {
         var dist = Common.distance(i, j, i2, j2);
         var range = ship.type.m;
         var shields = ship.type.s;
-
+        var enoughMove = Board.movesLeft >= dist;
         var fatal = shields <= dmg;
         var outOfRange = dist > range;
-        var can = !fatal && !outOfRange;
+        var can = !fatal && !outOfRange && enoughMove;
         console.log("canMoveTo "+i+", "+j+", "+i2+", "+j2+": "+can
-            +" (fatal: "+fatal+", outOfRange: "+outOfRange
+            +" (fatal: "+fatal+", outOfRange: "+outOfRange+", enoughMove"+enoughMove
             +", dmg: "+dmgAt.red+", "+dmgAt.blue+", shield: "+shields+")");
         return can;
     },
@@ -305,6 +305,11 @@ var Tile = {
             }
 
             function onClickShip() {
+                if (Board.turn != Board.teamName) {
+                    showMessage("chat", 
+                            {sender: "Client", color: "gray", contents: "It is not your turn!"});
+                    return;
+                }
                 if (hex.type.team != Board.teamName) {
                     if (Board.selectedTile == null) {
                         showMessage("chat", 
@@ -336,6 +341,11 @@ var Tile = {
             }
 
             function onClickBoard() {
+                if (Board.turn != Board.teamName) {
+                    showMessage("chat", 
+                            {sender: "Client", color: "gray", contents: "It is not your turn!"});
+                    return;
+                }
                 if (Board.previewTile == null) {
                     //make move
                     if (!Board.canMoveTo(Board.selectedTile.i, Board.selectedTile.j, hex.i, hex.j)) {

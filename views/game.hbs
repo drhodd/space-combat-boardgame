@@ -71,6 +71,7 @@
 
     io.on("moves left", function(movesLeft) {
         Board.movesLeft = movesLeft;
+        console.log("Moves left: "+movesLeft);
         showMessage("chat", 
             {sender: "Server", 
             contents: "You have "+Board.movesLeft+" moves left.", 
@@ -78,11 +79,12 @@
     });
 
     io.on("turn update", function(teamID) {
+        console.log("Turn update: "+teamID);
         var change = Board.teamName != teamID;
-        Board.isYourTurn = teamID == Board.teamName;
+        Board.turn = teamID;
         if (change) showMessage("chat",
                         {sender: "Server", 
-                        contents: Board.isYourTurn ? "It's your turn!" : "It's "+teamID+"'s turn!", 
+                        contents: "It's "+teamID+"'s turn!", 
                         color: "gray"});
     });
     
