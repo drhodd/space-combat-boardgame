@@ -81,7 +81,7 @@ function createNamespace(gameID) {
                                     : " is spectating!"));
                     console.log(m); 
                     gamespace.emit("chat", {sender: "Server", contents: m, color: "gray"});
-                    gamespace.emit("team change", teamID);
+                    socket.emit("team change", teamID);
                     applyMovesUsed(0);
                 } else if (cmd[0] == "/info") {
                     var x = Number(cmd[1]), y = Number(cmd[2]);
