@@ -309,7 +309,8 @@ var Tile = {
             function onClickShip() {
                 if (Board.turn != Board.teamName) {
                     showMessage("chat", 
-                            {sender: "Client", color: "gray", contents: "It is not your turn!"});
+                            {sender: "Client", color: "gray", 
+                            contents: Board.teamName != "none" ? "It is not your turn!" : "You are spectating!"});
                     return;
                 }
                 if (hex.type.team != Board.teamName) {
@@ -345,7 +346,8 @@ var Tile = {
             function onClickBoard() {
                 if (Board.turn != Board.teamName) {
                     showMessage("chat", 
-                            {sender: "Client", color: "gray", contents: "It is not your turn!"});
+                            {sender: "Client", color: "gray", 
+                            contents: Board.teamName != "none" ? "It is not your turn!" : "You are spectating!"});
                     return;
                 }
                 if (Board.previewTile == null) {

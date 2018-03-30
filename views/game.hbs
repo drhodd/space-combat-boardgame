@@ -38,6 +38,12 @@
     io.on("connect", function(message) {
         console.log("Connected to socket server as "+message+"!");
         io.emit("board request", gameID);
+        showMessage("chat", {sender: "Client", 
+            contents: "For game rules and stats, visit http://thepivot.net/debris/.", color: "gray"});
+        showMessage("chat", {sender: "Client", 
+            contents: "Commands: /nick, /join red, /join blue", color: "gray"});
+        showMessage("chat", {sender: "Client", 
+            contents: "This game is in beta. Please report bugs to @computerology_ on twitter.", color: "gray"});
     });
 
     io.on("disconnect", function(message) {
