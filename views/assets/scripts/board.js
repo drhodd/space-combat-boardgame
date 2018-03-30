@@ -95,11 +95,16 @@ var Board = {
         grid[i][j].y = old_hex.y;
         grid[i][j].i = old_hex.i;
         grid[i][j].j = old_hex.j;
+        grid[i][j].lastTurn = old_hex.lastTurn;
         stage.removeChild(old_hex);
         stage.addChild(grid[i][j]);
-        Board.refreshOverlays(layer == 'ship');
 
-        if (updateType == "move") Board.shipTiles[i][j].lastTurn = Board.turnID;
+        if (updateType == "move") {
+            Board.shipTiles[i][j].lastTurn = Board.turnID;
+            Board.selectedTile = null;
+        }
+
+        Board.refreshOverlays(layer == 'ship');
 
     },
 
@@ -312,6 +317,7 @@ var Tile = {
             }
 
             function onClickShip() {
+                console.log("Board.turnID "+Board.turnID+", clicked "+hex.lastTurn);
                 if (hex.lastTurn == Board.turnID) {
                     showMessage("chat", 
                             {sender: "Client", color: "gray", 
@@ -329,6 +335,13 @@ var Tile = {
                         showMessage("chat", 
                             {sender: "Client", color: "gray", contents: "This ship is not yours!"});
                     } else {
+                        console.log("Board.turnID "+Board.turnID+", selected "+Board.selectedTile.lastTurn);
+                        if (Board.selectedTile.lastTurn == Board.turnID) {
+                            showMessage("chat", 
+                                    {sender: "Client", color: "gray", 
+                                    contents: "You've moved this ship already!"});
+                            return;
+                        }
                         //send a ram packet
                         io.emit("move request", {
                             pos1: {i: Board.selectedTile.i, j: Board.selectedTile.j}, 

@@ -68,10 +68,12 @@ function createNamespace(gameID) {
                 //is command, split into name and params
                 var cmd = message.split(" ");
                 if (cmd[0] == '/nick') {
+                    if (cmd.length < 2) return;
                     gamespace.emit("chat", {sender: "Server", 
                         contents: usernames.get(socket.id)+" has set their nickname to "+cmd[1]+".", color: "gray"});
                     usernames.set(socket.id, cmd[1]);
                 } else if (cmd[0] == "/join") {
+                    if (cmd.length < 2) return;
                     var teamID = cmd[1]; //"red" or "blue"
                     userteams.set(socket.id, teamID);
                     console.log(usernames.get(socket.id)+" wants to change teams to "+teamID+" (color: "+teamcolors.get(teamID)+")");
@@ -84,9 +86,20 @@ function createNamespace(gameID) {
                     socket.emit("team change", teamID);
                     applyMovesUsed(0);
                 } else if (cmd[0] == "/info") {
+                    if (cmd.length < 3) return;
                     var x = Number(cmd[1]), y = Number(cmd[2]);
                     board.isTileEmpty(x, y, gameID, function(result) {
                         socket.emit("chat", {contents: "Tile empty: "+result, sender: "Server", color: "gray"});
+                    });
+                } else if (cmd[0] == "/end") {
+                    database.get("games", {url: gameID}, function(err, docs) {
+                        if (err) return;
+                        if (docs.length == 0) return;
+                        if (userteams.get(socket.id) != docs[0].turn) {
+                            socket.emit("chat", {sender: "Server", contents: "It is not your turn!", color: "gray"});
+                        } else {
+                            applyMovesUsed(32); //hacky: simulate a 32 hex move and end the turn
+                        }
                     });
                 }
             } else {

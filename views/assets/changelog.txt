@@ -4,6 +4,7 @@
 * fixed fleet move count being different for both teams
 * fixed miscellaneous chat bugs
 * ships can now only move once per turn
++ added "/end" command to end your turn
 
 1.0.0-alpha: March 29, 2018
 
