@@ -147,7 +147,7 @@ function createNamespace(gameID) {
                     board.moveShip(move.pos1.i, move.pos1.j, move.pos2.i, move.pos2.j, gameID, function(err) {
                         if (err) { console.log("Error moving tile: "+err); return; }
                         console.log("Moving tile!");
-                        gamespace.emit("tile update", move.pos1.i, move.pos1.j, "NONE", "move");
+                        gamespace.emit("tile update", move.pos1.i, move.pos1.j, "NONE", "normal");
                         gamespace.emit("tile update", move.pos2.i, move.pos2.j, data.name, "move");
                         board.killVulnerableShips(gameID, function(i, j, name) {
                             gamespace.emit("tile update", i, j, "NONE", "kill");

@@ -269,24 +269,24 @@ var Tile = {
     RED: {img: "hex_red.png", team: "none", s: 0, m: 0, ds: 0, dl: 0},
     GREEN: {img: "hex_green.png", team: "none", s: 0, m: 0, ds: 0, dl: 0},
     PURPLE: {img: "hex_purple.png", team: "none", s: 0, m: 0, ds: 0, dl: 0},
-    BLUE_BATTLESHIP: {img: "ship_blue_battleship.png", team: "blue", s: 40, m: 3, ds: 20, dl: 8},
-    BLUE_BOMBER: {img: "ship_blue_bomber.png", team: "blue", s: 20, m: 4, ds: 2, dl: 8},
-    BLUE_CARRIER: {img: "ship_blue_carrier.png", team: "blue", s: 36, m: 2, ds: 16, dl: 12},
+    BLUE_BATTLESHIP: {img: "ship_blue_battleship.png", team: "blue", s: 34, m: 3, ds: 16, dl: 8},
+    BLUE_BOMBER: {img: "ship_blue_bomber.png", team: "blue", s: 20, m: 5, ds: 2, dl: 8},
+    BLUE_CARRIER: {img: "ship_blue_carrier.png", team: "blue", s: 32, m: 2, ds: 12, dl: 12},
     BLUE_CRUISER: {img: "ship_blue_cruiser.png", team: "blue", s: 30, m: 4, ds: 8, dl: 8},
-    BLUE_DESTROYER: {img: "ship_blue_destroyer.png", team: "blue", s: 26, m: 4, ds: 12, dl: 4},
-    BLUE_ESCORT: {img: "ship_blue_escort.png", team: "blue", s: 8, m: 6, ds: 2, dl: 2},
-    BLUE_FLAGSHIP: {img: "ship_blue_flagship.png", team: "blue", s: 40, m: 2, ds: 24, dl: 12},
-    BLUE_GUNSHIP: {img: "ship_blue_gunship.png", team: "blue", s: 16, m: 5, ds: 6, dl: 0},
-    BLUE_MARAUDER: {img: "ship_blue_marauder.png", team: "blue", s: 12, m: 5, ds: 4, dl: 2},
-    RED_BATTLESHIP: {img: "ship_red_battleship.png", team: "red", s: 40, m: 3, ds: 20, dl: 8},
-    RED_BOMBER: {img: "ship_red_bomber.png", team: "red", s: 20, m: 4, ds: 2, dl: 8},
-    RED_CARRIER: {img: "ship_red_carrier.png", team: "red", s: 36, m: 2, ds: 16, dl: 12},
+    BLUE_DESTROYER: {img: "ship_blue_destroyer.png", team: "blue", s: 26, m: 4, ds: 10, dl: 4},
+    BLUE_ESCORT: {img: "ship_blue_escort.png", team: "blue", s: 10, m: 6, ds: 4, dl: 2},
+    BLUE_FLAGSHIP: {img: "ship_blue_flagship.png", team: "blue", s: 38, m: 2, ds: 20, dl: 10},
+    BLUE_GUNSHIP: {img: "ship_blue_gunship.png", team: "blue", s: 16, m: 5, ds: 8, dl: 2},
+    BLUE_MARAUDER: {img: "ship_blue_marauder.png", team: "blue", s: 12, m: 5, ds: 6, dl: 4},
+    RED_BATTLESHIP: {img: "ship_red_battleship.png", team: "red", s: 34, m: 3, ds: 16, dl: 8},
+    RED_BOMBER: {img: "ship_red_bomber.png", team: "red", s: 20, m: 5, ds: 2, dl: 8},
+    RED_CARRIER: {img: "ship_red_carrier.png", team: "red", s: 32, m: 2, ds: 12, dl: 12},
     RED_CRUISER: {img: "ship_red_cruiser.png", team: "red", s: 30, m: 4, ds: 8, dl: 8},
-    RED_DESTROYER: {img: "ship_red_destroyer.png", team: "red", s: 26, m: 4, ds: 12, dl: 4},
-    RED_ESCORT: {img: "ship_red_escort.png", team: "red", s: 8, m: 6, ds: 2, dl: 2},
-    RED_FLAGSHIP: {img: "ship_red_flagship.png", team: "red", s: 40, m: 2, ds: 24, dl: 12},
-    RED_GUNSHIP: {img: "ship_red_gunship.png", team: "red", s: 16, m: 5, ds: 6, dl: 0},
-    RED_MARAUDER: {img: "ship_red_marauder.png", team: "red", s: 12, m: 5, ds: 4, dl: 2},
+    RED_DESTROYER: {img: "ship_red_destroyer.png", team: "red", s: 26, m: 4, ds: 10, dl: 4},
+    RED_ESCORT: {img: "ship_red_escort.png", team: "red", s: 10, m: 6, ds: 4, dl: 2},
+    RED_FLAGSHIP: {img: "ship_red_flagship.png", team: "red", s: 38, m: 2, ds: 20, dl: 10},
+    RED_GUNSHIP: {img: "ship_red_gunship.png", team: "red", s: 16, m: 5, ds: 8, dl: 2},
+    RED_MARAUDER: {img: "ship_red_marauder.png", team: "red", s: 12, m: 5, ds: 6, dl: 4},
     
     //create a new tile (instance of createjs.Bitmap, with custom props)
     create: function(i, j, tile_type, layer) {
@@ -317,6 +317,7 @@ var Tile = {
             }
 
             function onClickShip() {
+                if (hex.type == Tile.NONE) return;
                 console.log("Board.turnID "+Board.turnID+", clicked "+hex.lastTurn);
                 if (hex.lastTurn == Board.turnID) {
                     showMessage("chat", 
@@ -342,11 +343,19 @@ var Tile = {
                                     contents: "You've moved this ship already!"});
                             return;
                         }
-                        //send a ram packet
-                        io.emit("move request", {
-                            pos1: {i: Board.selectedTile.i, j: Board.selectedTile.j}, 
-                            pos2: {i: hex.i, j: hex.j}
-                        }, true); //isRam = true
+                        if (hex.type >= Board.selectedTile.type.s * 2) {
+                            if (Common.distance(hex.i, hex.i, Board.selectedTile.i, Board.selectedTile.j) <= 2) {
+                                //send a ram packet
+                                io.emit("move request", {
+                                    pos1: {i: Board.selectedTile.i, j: Board.selectedTile.j}, 
+                                    pos2: {i: hex.i, j: hex.j}
+                                }, true); //isRam = true
+                            } else {
+                                showMessage("chat", {sender: "Client", contents: "You are too close to ram!", color: "gray"});
+                            }
+                        } else {
+                            showMessage("chat", {sender: "Client", contents: "You are not strong enough to ram!", color: "gray"});
+                        }
                     }
                     return;
                 }

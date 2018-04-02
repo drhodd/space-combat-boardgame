@@ -1,3 +1,9 @@
+1.0.2-alpha: March 31, 2018
+
+* fixed being unable to move to a tile a ship has been in
+* fixed game allowing ramming even though it will fail
+* fixed game allowing short range ramming
+
 1.0.1-alpha: March 30, 2018
 
 * fixed broken turn progression
