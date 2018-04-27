@@ -65,6 +65,14 @@ function createGame(callback) {
 
 }
 
+/**
+ * Update a set of values matching the query with the specified new_values, in the form of an object.
+ * Once finished, error or not, callback.
+ * @param {String} collectionName The name of the NoSQL collection to update in.
+ * @param {Object} query The query object to match against.
+ * @param {Object} new_values The new values to apply to each document matching the query.
+ * @param {function} callback The callback function: function(err, result)
+ */
 function update(collectionName, query, new_values, callback) {
     if (Object.keys(new_values).length == 0) { 
         console.log("No new values specified! Will not update "+collectionName+"."); 

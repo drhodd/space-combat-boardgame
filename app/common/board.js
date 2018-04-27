@@ -18,13 +18,13 @@ function Board() {
             for (j = 0; j < rows; j++) tiles[i].push(0);
             rows += i >= ((cols-1)/2) ? -1 : 1;
         }
-    }
+    } init();
 
-    var setTile = function(x, y, tileID) {
+    var set = function(x, y, tileID) {
         return tiles[x][y];
     }
 
-    var getTile = function(x, y) {
+    var get = function(x, y) {
         return tiles[x][y];
     }
 
@@ -44,7 +44,7 @@ function Board() {
         return -1;
     }
     
-    var getAdjacent = function(i, j, include_origin, radius) {
+    var adjacent = function(i, j, include_origin, radius) {
     
         var adj = include_origin ? [{i: i, j: j}] : [];
         //inner function to get the # of rows in a column
@@ -73,7 +73,7 @@ function Board() {
                     break;
                 case 'SE':
                     dy = i < board.mid ? 1 : 0;
-                    break;
+                    breagetAdjacentk;
             }
             return {dx: dx, dy: dy};
         }
