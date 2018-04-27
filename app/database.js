@@ -1,7 +1,11 @@
 var MongoClient = require('mongodb').MongoClient;
 var url = "mongodb://localhost";
 var database;
-var Tile = require('../app/common/tiles.js');
+
+var tile_ = require('../app/common/tiles.js');
+var Tile = tile_.Tile;
+var DEFAULT_STATE = tile_.DEFAULT_STATE;
+
 var socket = require('../app/socket.js');
 
 function connect() {
@@ -20,42 +24,13 @@ function createTables() {
 function createGame(callback) {
     var random_url = Math.random().toString(36).substring(8);
     var game = {url: random_url, turn: "red", movesLeft: 16};
-    var tile_entries = [
-        {name: "RED_FLAGSHIP", x: 7, y: 0, game: random_url},
-        {name: "RED_DESTROYER", x: 6, y: 0, game: random_url},
-        {name: "RED_DESTROYER", x: 8, y: 0, game: random_url},
-        {name: "RED_GUNSHIP", x: 5, y: 0, game: random_url},
-        {name: "RED_BATTLESHIP", x: 7, y: 1, game: random_url},
-        {name: "RED_GUNSHIP", x: 9, y: 0, game: random_url},
-        {name: "RED_MARAUDER", x: 4, y: 0, game: random_url},
-        {name: "RED_BOMBER", x: 6, y: 1, game: random_url},
-        {name: "RED_BOMBER", x: 8, y: 1, game: random_url},
-        {name: "RED_MARAUDER", x: 10, y: 0, game: random_url},
-        {name: "RED_ESCORT", x: 5, y: 1, game: random_url},
-        {name: "RED_CARRIER", x: 7, y: 2, game: random_url},
-        {name: "RED_ESCORT", x: 9, y: 1, game: random_url},
-        {name: "RED_ESCORT", x: 6, y: 2, game: random_url},
-        {name: "RED_ESCORT", x: 8, y: 2, game: random_url},
-        {name: "RED_CRUISER", x: 7, y: 3, game: random_url},
-        
-        {name: "BLUE_FLAGSHIP", x: 7, y: 14, game: random_url},
-        {name: "BLUE_DESTROYER", x: 6, y: 13, game: random_url},
-        {name: "BLUE_DESTROYER", x: 8, y: 13, game: random_url},
-        {name: "BLUE_GUNSHIP", x: 5, y: 12, game: random_url},
-        {name: "BLUE_BATTLESHIP", x: 7, y: 13, game: random_url},
-        {name: "BLUE_GUNSHIP", x: 9, y: 12, game: random_url},
-        {name: "BLUE_MARAUDER", x: 4, y: 11, game: random_url},
-        {name: "BLUE_BOMBER", x: 6, y: 12, game: random_url},
-        {name: "BLUE_BOMBER", x: 8, y: 12, game: random_url},
-        {name: "BLUE_MARAUDER", x: 10, y: 11, game: random_url},
-        {name: "BLUE_ESCORT", x: 5, y: 11, game: random_url},
-        {name: "BLUE_CARRIER", x: 7, y: 12, game: random_url},
-        {name: "BLUE_ESCORT", x: 9, y: 11, game: random_url},
-        {name: "BLUE_ESCORT", x: 6, y: 11, game: random_url},
-        {name: "BLUE_ESCORT", x: 8, y: 11, game: random_url},
-        {name: "BLUE_CRUISER", x: 7, y: 11, game: random_url}
-    ];
-    
+
+    //default board state
+    var tile_entries = []; for (var e = 0; e < DEFAULT_STATE.length; e++) {
+        tile_entries = {x: DEFAULT_STATE[e].x};
+        console.log(DEFAULT_STATE[e].x);
+    }
+
     insert("games", [game], function(err, result){
         if (err) { console.log("Failed to create game "+random_url+"!"); return; }
         insert("tiles", tile_entries, function(err, result) {

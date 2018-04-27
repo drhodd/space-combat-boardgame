@@ -29,15 +29,54 @@ var Tile = {
     RED_GUNSHIP: {id: 23, img: "ship_red_gunship.png", team: "red", s: 16, m: 5, ds: 8, dl: 2},
     RED_MARAUDER: {id: 24, img: "ship_red_marauder.png", team: "red", s: 12, m: 5, ds: 6, dl: 4},
 
-    get: function(id) {
+    get: function(idOrName) {
         for (var property in object) {
+            var ret = false;
             if (object.hasOwnProperty(property)) {
-                if (object[property].id == id) return object[property];
+                if (object[property].id == idOrName) ret = true;
             }
+            if (property == idOrName) ret = true;
+            if (ret) return object[property];
         }
     }
     
 };
+
+var DEFAULT_STATE = [
+    {name: "RED_FLAGSHIP", x: 7, y: 0},
+    {name: "RED_DESTROYER", x: 6, y: 0},
+    {name: "RED_DESTROYER", x: 8, y: 0},
+    {name: "RED_GUNSHIP", x: 5, y: 0},
+    {name: "RED_BATTLESHIP", x: 7, y: 1},
+    {name: "RED_GUNSHIP", x: 9, y: 0},
+    {name: "RED_MARAUDER", x: 4, y: 0},
+    {name: "RED_BOMBER", x: 6, y: 1},
+    {name: "RED_BOMBER", x: 8, y: 1},
+    {name: "RED_MARAUDER", x: 10, y: 0},
+    {name: "RED_ESCORT", x: 5, y: 1},
+    {name: "RED_CARRIER", x: 7, y: 2},
+    {name: "RED_ESCORT", x: 9, y: 1},
+    {name: "RED_ESCORT", x: 6, y: 2},
+    {name: "RED_ESCORT", x: 8, y: 2},
+    {name: "RED_CRUISER", x: 7, y: 3},
+    
+    {name: "BLUE_FLAGSHIP", x: 7, y: 14},
+    {name: "BLUE_DESTROYER", x: 6, y: 13},
+    {name: "BLUE_DESTROYER", x: 8, y: 13},
+    {name: "BLUE_GUNSHIP", x: 5, y: 12},
+    {name: "BLUE_BATTLESHIP", x: 7, y: 13},
+    {name: "BLUE_GUNSHIP", x: 9, y: 12},
+    {name: "BLUE_MARAUDER", x: 4, y: 11},
+    {name: "BLUE_BOMBER", x: 6, y: 12},
+    {name: "BLUE_BOMBER", x: 8, y: 12},
+    {name: "BLUE_MARAUDER", x: 10, y: 11},
+    {name: "BLUE_ESCORT", x: 5, y: 11},
+    {name: "BLUE_CARRIER", x: 7, y: 12},
+    {name: "BLUE_ESCORT", x: 9, y: 11},
+    {name: "BLUE_ESCORT", x: 6, y: 11},
+    {name: "BLUE_ESCORT", x: 8, y: 11},
+    {name: "BLUE_CRUISER", x: 7, y: 11}
+];
 
 /**
  * Handle both server and client
@@ -47,4 +86,5 @@ if (!isModule) {
 } else {
     console.log("Exporting tiles.js as module.");
     module.exports.Tile = Tile;
+    module.exports.DEFAULT_STATE = DEFAULT_STATE;
 }

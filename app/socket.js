@@ -1,14 +1,13 @@
-import { Board } from './common/board.js';
+var board_ = require('../app/common/board.js');
 var io; var namespaces = [];
 var database = require('../app/database.js');
-var Tile = require("../app/tiles.js");
-var Common = require("../app/common/common.js");
+var Tile = require("../app/common/tiles.js");
 
 function init(socketIO) {
     io = socketIO;
     io.on('connection', function(socket) {
         console.log(socket.id+" has connected!");
-        socket.emit("connection", ""); //tell client of a successful connection (send the socket ID too)
+        socket.emit("connection", ""); //tell client of a successful connection
     });
 }
 
@@ -31,7 +30,7 @@ function namespace(gameID) {
     var userteams = new Map(); //map socket IDs to teams
 
     //initialize the game board with the default set of tiles
-    var board = new Board();
+    var board = new board_.Board();
 
     //if a saved state already exists for this game, fill the board with it
     // ...unfinished.
@@ -62,4 +61,4 @@ function namespace(gameID) {
 }
 
 module.exports.init = init;
-module.exports.Namespace = Namespace;
+module.exports.namespace = namespace;

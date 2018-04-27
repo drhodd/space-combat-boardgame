@@ -30,19 +30,23 @@ app.use('/common',express.static(path.join(__dirname, 'app/common')));
 
 /*HTTP REQUEST HANDLERS*/
 
+//creating a new game
 app.get('/new', (request, response) => {
+    var randomID = Math.random().toString(36).substring(8);
     database.createGame(function(err, result, url) { //render only when operation completes
         if (err) { 
-            console.log("An error occured creating game "+r+"."); 
+            console.log("An error occured creating game "+randomID+"."); 
             response.render("404", {});
             return; 
         }
-        response.render("redirect", {
+        socket.namespace(randomID, response.render("redirect", {
             url: "/game/"+url
-        });
+        }));
     });
+
 });
 
+//navigating to an existing game
 app.get('/game/:gameID', (request, response) => {
     var gameID = request.params.gameID;
     database.get("games", {url: gameID}, function(err, docs) {
