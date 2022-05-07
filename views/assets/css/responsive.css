@@ -1,0 +1,40 @@
+@media (max-width: 820px) {
+    .header {
+        width: 100%;
+        background-position: center top;
+    }
+    .header img {
+        width: 100%;
+    
+    }
+    .nav {
+        width: 100%;
+    }
+    .body {
+        width: 100%;
+    }
+
+    .sectionLeft, .sectionRight {
+        float: none;
+        width: 100%;
+       
+    }
+
+    .footer {
+        width: 100%;
+    }
+
+    .footer .pad {
+        padding: 10px 20px 60px 20px;
+
+    }
+    .footer .l {
+        width: 100%;
+        float: none;
+    }
+    
+    .footer .r {
+        width: 100%;
+        float: none;
+    }
+}

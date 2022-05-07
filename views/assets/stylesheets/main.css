@@ -1,0 +1,170 @@
+@charset "utf-8";
+
+/* CSS Document */
+
+/* Template */
+
+
+
+body {
+    margin: 0;    
+    background-color: #383d54;
+    color: #9EC5A2;
+    font-family: 'Play', sans-serif;
+    font-size: 14px;
+}
+
+
+
+.gradientBurst {    
+    background-image: url(../images/bg_purple.png);
+    background-repeat: no-repeat;
+    background-position: center top;
+}
+
+
+.headerBG {
+    height: 139px;
+    background-image: url(../images/headerBG.png);
+    background-repeat: repeat-x;
+}
+
+.header {
+    width: 800px;
+    margin-right: auto;
+    margin-left: auto;
+    background-image: url(../images/header.png);
+    background-repeat: no-repeat;
+    height: 139px;
+}
+
+.nav {
+    width: 800px;
+    margin: auto;
+}
+.activePnav, .nav .item:hover {
+    background-color: rgba(0, 0, 0, 0.2) !important;
+}
+.nav .item {
+    float: left;
+    padding: 10px 24px;
+    background-color: rgba(0, 0, 0, 0.1);
+    transition: all .2s ease;
+    cursor: pointer;
+    display: block;
+    text-decoration: none;
+}
+
+.nav .item:hover {
+    text-decoration: underline;
+}
+
+.bodyBG {}
+
+
+.body {
+    width: 800px;
+    margin-right: auto;
+    margin-left: auto;
+    min-height: 600px;
+}
+
+h1 {
+    margin: 0 0 20px 0;
+    font-size: 22px;
+}
+
+
+h2 {
+    
+}
+.vspace40 {
+    min-height: 40px;    
+}
+
+.vspace60 {
+    min-height: 60px;
+}
+
+.section {  
+    background-color: rgba(0, 0, 0, 0.2);
+    min-height: 300px;
+    margin: 0 0 20px 0;
+}
+
+.section .pad {
+    padding: 10px 30px 30px 30px;
+}
+
+.sectionLeft {
+    width: 40%;
+    float: left;
+}
+
+.sectionRight {
+    width: 57%;
+    float: right;   
+}
+
+.footerBG {
+    background-color: #0D0D0D;
+    min-height: 139px;
+    padding: 0 0 0 0;
+}
+
+
+.footer {
+    width: 800px;
+    margin-right: auto;
+    margin-left: auto;
+    color: #fff;
+    padding: 10px 0 60px 0;
+}
+
+.footer .l {
+
+    width: 50%;
+    float: left;
+}
+
+.footer .r {
+    width: 50%;
+    float: left;
+}
+
+.footer .pad {
+    padding: 20px 20px;
+}
+
+.footer h1 {
+    font-size: 19px;
+    margin: 20px 0 4px !important;
+}
+
+.footer p {
+    font-size: 12px;
+    line-height: 18px;
+    text-align:  justify;
+    width: 96%;
+    padding: 8px;
+}
+
+.footer ul {
+    
+
+}
+
+.footer ul li {
+    font-size: 12px;
+    margin: 4px 0 6px 0;
+}
+
+
+.clear {
+    clear: both;
+}
+
+.floatRight {
+    float: right;
+}
+/* Template */

@@ -1,0 +1,165 @@
+<!DOCTYPE HTML>
+
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Debris - Space Combat Board Game - Info</title>
+    <link href='http://fonts.googleapis.com/css?family=Play|Iceland' rel='stylesheet' type='text/css'>
+    <link href="css/main.css" rel="stylesheet" type="text/css">
+    <link href="css/responsive.css" rel="stylesheet" type="text/css">
+    <link href="css/old-styles.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="fb/lib/jquery-1.9.0.min.js"></script>
+    <!-- Add mousewheel plugin (this is optional) -->
+	<script type="text/javascript" src="fb/lib/jquery.mousewheel-3.0.6.pack.js"></script>
+
+	<!-- Add fancyBox main JS and CSS files -->
+	<script type="text/javascript" src="fb/source/jquery.fancybox.js?v=2.1.4"></script>
+	<link rel="stylesheet" type="text/css" href="fb/source/jquery.fancybox.css?v=2.1.4" media="screen" />
+
+	<!-- Add Button helper (this is optional) -->
+	<link rel="stylesheet" type="text/css" href="fb/source/helpers/jquery.fancybox-buttons.css?v=1.0.5" />
+	<script type="text/javascript" src="fb/source/helpers/jquery.fancybox-buttons.js?v=1.0.5"></script>
+
+	<!-- Add Thumbnail helper (this is optional) -->
+	<link rel="stylesheet" type="text/css" href="fb/source/helpers/jquery.fancybox-thumbs.css?v=1.0.7" />
+	<script type="text/javascript" src="fb/source/helpers/jquery.fancybox-thumbs.js?v=1.0.7"></script>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			
+
+			$('.fancybox-thumbs').fancybox({
+				prevEffect : 'none',
+				nextEffect : 'none',
+
+				closeBtn  : true,
+				arrows    : true,
+				nextClick : true,
+
+				helpers : {
+					thumbs : {
+						width  : 50,
+						height : 50
+					}
+				}
+			});
+	
+		});
+	</script>
+</head>
+
+<body>
+    <div class="gradientBurst">
+        <div class="headerBG">
+            <div class="header"></div>            
+        </div>
+        <div class="nav">
+                <a href="/" class="item activePnav">info</a>
+                <a href="/ships" class="item">ships</a>
+                <a href="/new" class="item">play!</a>
+            <div class="clear"></div>
+        </div>
+        <div class="bodyBG">
+            <div class="body">
+                <!-- section -->
+                <div class="section">
+                    <div class="pad">
+                        <div class="main">
+                            <!--<h1>Info</h1>-->
+                            <h2>The Game</h2>
+                            <div class="inlineImage inlineImageRight"><a class="fancybox-thumbs" data-fancybox-group="thumb" href="images/2018/uiDemo.png" title="Game Board 2018"><img src="images/2018/uiDemo.png" width="160" /></a></div>
+                            <p>Debris is a turn based, space strategy game played on a 2D hex map between two players, like Chess. Indeed, it is intended to be sort of an evolution of Chess which began its life when I asked myself, what if Chess pieces could attack at range? And support each other? </p>
+                        
+                            <h2>A Brief History of Debris</h2>
+                        
+                            <p>2018 - Amazingly, there is a playable alpha version online now but you'll need to <a href="https://twitter.com/RQ_Machines" target="_blank">request the link.</a></p>
+                                
+                            <p>The rules and the stats are in flux, and there are many things yet to be added. We're currently working on what we're calling the 'classic' version which is a no-frills, head to head duel to the death.</p>
+                        
+                            <h2>Summary of Rules and Gameplay</h2>
+                        
+                            <ul>
+                                <li>
+                                    <p>One player creates a new game and shares the URL with a friend. Once on the page, follow the instructions and join opposing teams. The idea is to decimate the opposing fleet.</p>
+                                </li>
+                            
+                                <li>
+                                    <p>Each side starts with 16 ships. Each type of ship, there are nine, has its own stats which can be seen <a href="ships.html">here</a>.</p>
+                                </li>
+                            
+                                <li>
+                                    <p>Each player can move multiple ships per turn. This is counted in hexes. As the number of ships on the board diminishes, so does the number of hexes each player can move per turn. This number is called the Fleet Move Value. It stars at 16 because each player starts with 16 ships.</p>
+                                </li>
+                            
+                                <li>
+                                    <p><strong class="highlight">The most important thing you need to know if you're about to play for the first time is: FOUR HEXES!</strong></p>
+                                        
+                                    <div class="inlineImage inlineImageRight" style="background-color: #fff;"><a class="fancybox-thumbs" data-fancybox-group="thumb" href="images/example1.png" title="Damage Example - FOUR HEXES!"><img src="images/example1.png" alt=""  width="160"/></a></div>
+                                        
+                                    <p>All ships do damage out to four hexes from their position on the map. And this damage is cumulative. Ships that are within 8 hexes of one another are essentially assiating each other at all times by overlapping their damage.</p>
+                                </li>
+                            
+                                <li>
+                                    <p>The challenge is to advance your fleet carefully towards the enemy. You attack automatically as you move. Your opponent will be looking for the weak spots in your damage projections to exploit them when it's their turn. If you move up too quickly to get a kill, you may be spreading yourself too thin and will get picked off When your opponent advances. On the other hand, if you don't get your ships off the back wall and formed up nicely, then you will have a wall of damage in your face before you know it and no room to maneuver.</p>
+                                </li>
+                            
+                                <li>
+                                    <p>Currently there is no coded win condition. You can continue playing until you're out of ships. But you won't need to. Once one side loses a certain amount of firepower, it becomes pretty obvious that you're done.</p>
+                                </li>
+                            </ul>
+                        
+                            <h2>The Future</h2>
+                        
+                            <p>We have so many ideas we can't even get them all in yet. Some of the things in the works:</p>
+                            <ul>
+                                <li>Ramming overhaul</li>
+                                <li>Special Tiles - such as asteroids and wormholes</li>
+                                <li>Support Ships - which project additional shields to allies</li>
+                                <li>Win Conditions</li>
+                                <li>A proper UI</li>
+                                <li>And another gameplay mode entirely where each ship type has a unique attack pattern</li>
+                                <li>Play by mail</li>
+                                <li>Ranks and acheivements</li>
+                                <li>Matchmaking</li>
+                            </ul>                   
+                        </div>
+                    </div>
+                </div>
+                <!-- sectionLeft 
+                <div class="section sectionLeft">
+                    <div class="pad"></div>
+                </div>-->
+                <!-- sectionRight
+                <div class="section sectionRight">
+                    <div class="pad"></div>
+                </div> -->
+                <div class="clear"></div>                
+            </div>
+            <div class="clear vspace60"></div>   
+        </div>
+
+        <div class="footerBG">
+            <div class="footer">               
+                <div class="l">
+                    <div class="pad">
+                        <h1>About this Game</h1>
+                        <p>Debris is an online game that is currently being developed by <a href="https://twitter.com/RQ_Machines">@RQ_Machines</a> and a few other very talented people. It will be playable in the browser and has been tested mostly in Chrome.</p>
+
+                        <p>There is a playable Aplha version online. If you would like to play <a href="https://twitter.com/RQ_Machines">send me a message on Twitter</a>. I'll be happy to blow you out of the sky. </p>
+                    </div>
+                </div>
+                <div class="r">
+                    <div class="pad">
+                       
+                        <h1>Feedback</h1>
+                        <p>Questions, comments, suggestions, bug reports &amp; insults welcome.</p>
+                        <p><a href="https://twitter.com/RQ_Machines">@RQ_Machines</a></p>                       
+                    </div>
+                </div>
+                <div class="clear"></div>
+            </div>
+            <div class="clear"></div>
+        </div>
+    </div>
+</body>
+
+</html>

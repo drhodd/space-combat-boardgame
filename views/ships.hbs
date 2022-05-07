@@ -1,0 +1,242 @@
+<!DOCTYPE HTML>
+
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Debris - Space Combat Board Game - Ships</title>
+    <link href='http://fonts.googleapis.com/css?family=Play|Iceland' rel='stylesheet' type='text/css'>
+    <link href="css/main.css" rel="stylesheet" type="text/css">
+    <link href="css/responsive.css" rel="stylesheet" type="text/css">
+    <link href="css/old-styles.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="fb/lib/jquery-1.9.0.min.js"></script>
+    <!-- Add mousewheel plugin (this is optional) -->
+	<script type="text/javascript" src="fb/lib/jquery.mousewheel-3.0.6.pack.js"></script>
+
+	<!-- Add fancyBox main JS and CSS files -->
+	<script type="text/javascript" src="fb/source/jquery.fancybox.js?v=2.1.4"></script>
+	<link rel="stylesheet" type="text/css" href="fb/source/jquery.fancybox.css?v=2.1.4" media="screen" />
+
+	<!-- Add Button helper (this is optional) -->
+	<link rel="stylesheet" type="text/css" href="fb/source/helpers/jquery.fancybox-buttons.css?v=1.0.5" />
+	<script type="text/javascript" src="fb/source/helpers/jquery.fancybox-buttons.js?v=1.0.5"></script>
+
+	<!-- Add Thumbnail helper (this is optional) -->
+	<link rel="stylesheet" type="text/css" href="fb/source/helpers/jquery.fancybox-thumbs.css?v=1.0.7" />
+	<script type="text/javascript" src="fb/source/helpers/jquery.fancybox-thumbs.js?v=1.0.7"></script>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			
+
+			$('.fancybox-thumbs').fancybox({
+				prevEffect : 'none',
+				nextEffect : 'none',
+
+				closeBtn  : true,
+				arrows    : true,
+				nextClick : true,
+
+				helpers : {
+					thumbs : {
+						width  : 50,
+						height : 50
+					}
+				}
+			});
+	
+		});
+	</script>
+</head>
+
+<body>
+    <div class="gradientBurst">
+        <div class="headerBG">
+            <div class="header"></div>            
+        </div>
+        <div class="nav">
+            <a href="/" class="item">info</a>
+            <a href="/ships" class="item activePnav">ships</a>
+            <a href="/new" class="item">play!</a>
+            <div class="clear"></div>
+        </div>
+        <div class="bodyBG">
+            <div class="body">
+                <!-- section -->
+                <div class="section">
+                    <div class="pad">
+                            <div class="main">
+                                    <!--<h1>Ship Stats</h1>-->
+                                    <div class="vspace40"></div>
+                                    <p>The ships have four stats that are needed for play.</p>
+                                <ul>
+                                    <li><p><strong>Shield (S)</strong> the amount of damage your ship's shield can withstand before the ship is destroyed. </p></li>
+                                    <li><p><strong>Move (M)</strong> the number of hexes that a ship can move in one turn.</p></li>
+                                    <li><p><strong>Damage Short (DS)</strong> the number of damage points the ship projects at short range (2 hexes).</p></li>
+                                    <li><p><strong>Damage Long (DL)</strong> the number of damage points the ship projects at long range (4 hexes).</p></li>
+                                </ul>
+                                
+                                <p>Here are the stats and icons for each ship.</p>
+                                
+                                    <div class="ship">
+                                        <div class="shipPic">
+                                            <div class="shipStats left">
+                                                <div>S:10</div>
+                                                <div>M:6</div>
+                                                <div>DS:6</div>
+                                                <div>DL:2</div>
+                                            </div>
+                                            <a class="fancybox-thumbs" data-fancybox-group="thumb" href="images/gallery/2018escort.png" title="Escort - little more than a long-range fighter, escorts are the fastest ships in the fleet."><img src="images/techimages/2018escort.png" width="220"/></a>
+                                        </div>
+                                        <h2>Gunship</h2>
+                                        <p class="shipDesc">The Gunship is little more than a long-range fighter. Gunships are the fastest ships in the fleet so use them to zip in and support where needed. These ships are very effective as bait and for ramming.</p>
+                                        <div class="clear"></div>
+                                    </div>
+                                    <div class="ship">
+                                        <div class="shipPic">
+                                            <div class="shipStats left">
+                                                <div>S:12</div>
+                                                <div>M:5</div>
+                                                <div>DS:8</div>
+                                                <div>DL:4</div>
+                                            </div>
+                                            <a class="fancybox-thumbs" data-fancybox-group="thumb" href="images/gallery/2018marauder.png" title="Marauder - almost as fast as an Escort but are tougher and have more firepower."><img src="images/techimages/2018marauder.png" width="220" /></a> </div>
+                                        <h2>Marauder</h2>
+                                        <p class="shipDesc">The Marauder has two missile tubes and two guns. They are almost as fast as a Gunship but are tougher and have more firepower. Use them wisely and they can tip the balance when the big ships clash. </p>
+                                        <p class="shipDesc"><strong>COMING</strong> - the Marauder may be the only ship that can fly into lethal damage. But make it count or it will be a sitting duck when your turn is over.</p>
+                                        <div class="clear"></div>
+                                    </div>
+                                    <div class="ship">
+                                        <div class="shipPic">
+                                            <div class="shipStats left">
+                                                <div>S:16</div>
+                                                <div>M:5</div>
+                                                <div>DS:10</div>
+                                                <div>DL:4</div>
+                                            </div>
+                                            <a class="fancybox-thumbs" data-fancybox-group="thumb" href="images/gallery/2018gunship.png" title="Gunship - close range brawlers good for adding support your capital ships."><img src="images/techimages/2018gunship.png" width="220" /></a> </div>
+                                        <h2>Escort</h2>
+                                        <p class="shipDesc">Escorts have no missile tubes therefore no long range damage value. With 6 guns they are tough little brawlers and are good for adding fire support to your capital ships.</p>
+                                        <p class="shipDesc"><strong>COMING</strong> - Escorts may soon be able to provide support to other ships by projecting negative damage thereby increasing the sheild value of all adjacent friendly ships.</p>
+                                        <div class="clear"></div>
+                                    </div>
+                                    <div class="ship">
+                                        <div class="shipPic">
+                                            <div class="shipStats left">
+                                                <div>S:18</div>
+                                                <div>M:5</div>
+                                                <div>DS:4</div>
+                                                <div>DL:8</div>	
+                                            </div>
+                                            <a class="fancybox-thumbs" data-fancybox-group="thumb" href="images/gallery/2018bomber.png" title="Bomber - use its projected firepower to support attacks and provide cover for key formations."><img src="images/techimages/2018bomber.png"  width="220" /></a> </div>
+                                        <h2>Bomber</h2>
+                                        <p class="shipDesc">Medium Bomber ("Bomber" for short) has four missile tubes and is the largest non-capital ship. Use its projected firepower to support attacks and provide cover for key formations.</p>
+                                        <div class="clear"></div>
+                                    </div>
+                                    <div class="ship">
+                                        <div class="shipPic">
+                                            <div class="shipStats left">
+                                                <div>S:26</div>
+                                                <div>M:4</div>
+                                                <div>DS:8</div>
+                                                <div>DL:6</div>
+                                            </div>
+                                            <a class="fancybox-thumbs" data-fancybox-group="thumb" href="images/gallery/2018destroyer.png" title=""><img src="images/techimages/2018destroyer.png" width="220" /></a>
+                                        </div>
+                                        <h2>Destroyer</h2>
+                                        <p class="shipDesc">The smallest capital ship has 2 missile tubes and 4 turrets. The Destroyer is the smallest ship that can ram a Flagship and destroy it with no support.</p>
+                                        <div class="clear"></div>
+                                    </div>	
+                                    <div class="ship">
+                                        <div class="shipPic">
+                                            <div class="shipStats left">
+                                                <div>S:30</div>
+                                                <div>M:4</div>
+                                                <div>DS:10</div>
+                                                <div>DL:8</div>
+                                            </div>
+                                            <a class="fancybox-thumbs" data-fancybox-group="thumb" href="images/gallery/2018cruiser.png" title="Cruiser- hefty fighter with a fair top speed."><img src="images/techimages/2018cruiser.png" width="220"  /></a> </div>
+                                        <h2>Cruiser</h2>
+                                        <p class="shipDesc">3 missile tubes, 3 turrets and 4 guns make the Cruiser a hefty fighter with a fair top speed. As the fastest capital ship, it can swoop in to help where needed, but it can also wind up in over its head. </p>
+                                        <div class="clear"></div>
+                                    </div>
+                                    <div class="ship">
+                                        <div class="shipPic">
+                                            <div class="shipStats left">
+                                                <div>S:32</div>
+                                                <div>M:2</div>
+                                                <div>DS:12</div>
+                                                <div>DL:12</div>
+                                            </div>
+                                            <a class="fancybox-thumbs" data-fancybox-group="thumb" href="images/gallery/2018carrier.png" title="Carrier - Slow but powerful."><img src="images/techimages/2018carrier.png" width="220"  /></a>
+                                        </div>
+                                        <h2>Carrier</h2>
+                                        <p class="shipDesc">A Carrier has 2 missile tubes, 1 turret and 8 fighter bays which give it its punch at long range. The fighter bays take up the bulk of the ship and its mobility suffers. It is best to keep your Carrier at a safe distance anyhow.</p>
+                                        <div class="clear"></div>
+                                    </div>
+                                    <div class="ship">
+                                        <div class="shipPic">
+                                            <div class="shipStats left">
+                                                <div>S:34</div>
+                                                <div>M:3</div>
+                                                <div>DS:14</div>
+                                                <div>DL:10</div>
+                                            </div>
+                                            <a class="fancybox-thumbs" data-fancybox-group="thumb" href="images/gallery/2018battleship.png" title="Battleship - it is deadly when attacking with escorts."><img src="images/techimages/2018battleship.png" width="220"  /></a> </div>
+                                        <h2>Battleship</h2>
+                                        <p class="shipDesc">The Battleship is equipped with 4 tubes, 4 turrets and 4 guns. It is a deadly ship when attacking with escorts. A ramming Bomber can destroy a Battleship so keep them covered!</p>
+                                        <div class="clear"></div>
+                                    </div>
+                                    <div class="ship">
+                                        <div class="shipPic">
+                                            <div class="shipStats left">
+                                                <div>S:38</div>
+                                                <div>M:2</div>
+                                                <div>DS:20</div>
+                                                <div>DL:10</div>
+                                            </div>
+                                            <a class="fancybox-thumbs" data-fancybox-group="thumb" href="images/gallery/2018flagship.png" title="Flagship - so big there can be only one."><img src="images/techimages/2018flagship.png" width="220" /></a>
+                                        </div>
+                                        <h2>Flagship</h2>
+                                        <p class="shipDesc">The largest and toughest ship in the fleet boasts 4 of each type of weapon. Neither an Escort nor a Marauder can even GET within four hexes. A Gunship or a Bomber can only get within two if they are ramming! The game is not over when a Flagship is destroyed but that player sure has lost his most valuable piece.</p>
+                                    </div>
+                                </div>
+                                <div class="clear"></div>
+                    </div>
+                </div>
+                <!-- sectionLeft 
+                <div class="section sectionLeft">
+                    <div class="pad"></div>
+                </div>-->
+                <!-- sectionRight
+                <div class="section sectionRight">
+                    <div class="pad"></div>
+                </div> -->
+                <div class="clear"></div>                
+            </div>
+            <div class="clear vspace60"></div>   
+        </div>
+
+        <div class="footerBG">
+            <div class="footer">               
+                <div class="l">
+                    <div class="pad">
+                        <h1>About this Game</h1>
+                        <p>Debris is an online game that is currently being developed by <a href="https://twitter.com/RQ_Machines">@RQ_Machines</a> and a few other very talented people. It will be playable in the browser and has been tested mostly in Chrome.</p>
+
+                        <p>There is a playable Aplha version online. If you would like to play <a href="https://twitter.com/RQ_Machines">send me a message on Twitter</a>. I'll be happy to blow you out of the sky. </p>
+                    </div>
+                </div>
+                <div class="r">
+                    <div class="pad">                       
+                        <h1>Feedback</h1>
+                        <p>Questions, comments, suggestions, bug reports &amp; insults welcome.</p>
+                        <p><a href="https://twitter.com/RQ_Machines">@RQ_Machines</a></p>                         
+                    </div>
+                </div>
+                <div class="clear"></div>
+            </div>
+            <div class="clear"></div>
+        </div>
+    </div>
+</body>
+
+</html>

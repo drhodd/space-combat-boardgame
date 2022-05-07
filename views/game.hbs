@@ -21,6 +21,10 @@
             style = "float: right; color: white; margin-right: 10px;">
             game version: 1.0.3-alpha
         </a>
+        <a target = "_blank" href = "/" 
+            style = "float: right; color: yellow; margin-right: 10px;">
+            how to play
+        </a>
     </div>
 </body>
 
@@ -36,6 +40,10 @@
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
+
+    const messageAudio = new Audio("/audio/message.wav");
+    const newTurnAudio = new Audio("/audio/yourturn.mp3");
+
     var gameID = "{{gameID}}";
     var io = io("/"+gameID);
     
@@ -67,6 +75,7 @@
     
     io.on("chat", function(message) {
         showMessage("chat", message);
+        messageAudio.play();
         console.log(message.sender+": "+message.contents);
     });
 
@@ -98,8 +107,9 @@
             showMessage("chat",
                         {sender: "Server", 
                         contents: "It's "+teamID+"'s turn!", 
-                        color: "gray"});
+                        color: teamID});
             Board.turnID = Math.floor(Math.random()*100000)+"";
+            newTurnAudio.play();
         }
         Board.refreshOverlays(true);
     });

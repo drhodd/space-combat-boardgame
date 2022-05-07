@@ -30,6 +30,18 @@ app.use('/common',express.static(path.join(__dirname, 'app/common')));
 
 /*HTTP REQUEST HANDLERS*/
 
+app.get("/", (request, response) => {
+    response.render("home", {
+        layout: "none"
+    });
+});
+
+app.get("/ships", (request, response) => {
+    response.render("ships", {
+        layout: "none"
+    });
+});
+
 app.get('/new', (request, response) => {
     database.createGame(function(err, result, url) { //render only when operation completes
         if (err) { 
